@@ -1,0 +1,16 @@
+[Unit]
+Description=Gunicorn daemon for Django Project
+Before=nginx.service
+After=network.target
+
+[Service]
+WorkingDirectory=/home/django/wilber-web
+ExecStart=/home/django/.virtualenvs/wilber/bin/gunicorn --name=wilber --pythonpath=/home/django/wilber-web/wilber/ --bind unix:/home/django/gunicorn-wilber.socket --config /etc/gunicorn.d/gunicorn.py wilber.wsgi:application
+Restart=always
+SyslogIdentifier=gunicorn-wilber
+User=django
+Group=django
+
+
+[Install]
+WantedBy=multi-user.target
