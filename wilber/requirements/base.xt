@@ -1,2 +1,8 @@
 Django==2.1.1
+django-filter==2.0.0
+djangorestframework==3.8.2
+gevent==1.3.6
+greenlet==0.4.15
+gunicorn==19.9.0
+Markdown==3.0.1
 pytz==2018.5

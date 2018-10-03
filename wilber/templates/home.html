@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Asset Manager</h2>
+    <h1>Brushes</h1>
+    
+    {% for brush in brushes %}
+    <p>{{ brush.name }}</p>
+    {%endfor %}
+    
+    <h1>Patterns</h1>
+    
+    {% for pattern in patterns %}
+    <p>{{ pattern.name }}</p>
+    {%endfor %}
+{% endblock content %}

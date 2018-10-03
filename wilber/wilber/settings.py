@@ -25,12 +25,12 @@ SECRET_KEY = '2e3f#bpw&w7p^51h^2x53i411@53gtx9%^obvf82(md*@qt%6b'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['104.248.232.184']
+ALLOWED_HOSTS = ['127.0.0.1', '104.248.232.184']
 
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,6 +38,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+THIRD_PARTY_APPS = [
+    'rest_framework',
+]
+LOCAL_APPS = [
+    'asset_sharing',
+]
+
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -54,7 +64,7 @@ ROOT_URLCONF = 'wilber.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates',],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -118,3 +128,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+        #'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}

@@ -14,8 +14,30 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.conf.urls import url
+from django.urls import path, include
+
+from rest_framework import routers
+
+from asset_sharing.views import home
+from asset_sharing.api import AssetViewSet
+from asset_sharing.api import BrushViewSet
+from asset_sharing.api import PatternViewSet
+
+
+# Routers provide an easy way of automatically determining the URL conf.
+router = routers.DefaultRouter()
+router.register(r'assets', AssetViewSet)
+router.register(r'brushes', BrushViewSet)
+router.register(r'patterns', PatternViewSet)
+
 
 urlpatterns = [
+    url(r'^', include(router.urls)),
     path('admin/', admin.site.urls),
+    path('api-auth/', include('rest_framework.urls')),
+    path('home/', view=home),
+    path('asset/', include('asset_sharing.urls')),
 ]
+
+
