@@ -4,7 +4,8 @@ from django.contrib import admin
 from .models import Asset, Brush, Pattern
 
 class AssetAdmin(admin.ModelAdmin):
-    pass
+    readonly_fields = ('image_tag',)
+    list_display = ['name', 'owner']
     
 class BrushAdmin(admin.ModelAdmin):
     pass
