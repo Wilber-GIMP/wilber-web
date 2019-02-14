@@ -1,10 +1,21 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Wilber GIMP Asset Manager</title>
-    </head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wilber - Share Grafic Assets</title>
+    <link  rel="stylesheet" href="{% static 'libs/simple-grid.min.css' %}">
+    <link  rel="stylesheet" href="{% static 'assets/wilber.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+</head>
+<body>
+<div class="container main-grid">
+    {% block content %}
 
-    <body>
-    {% block content %}{% endblock content %}
-    </body>
+    {% endblock %}
+</div>
+<script src="{% static 'libs/snap.svg-min.js' %}"></script>
+<script src="{% static 'assets/wilber.js' %}"></script>
+
+</body>
 </html>
