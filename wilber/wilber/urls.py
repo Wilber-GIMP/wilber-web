@@ -31,10 +31,10 @@ router.register(r'patterns', PatternViewSet)
 
 
 urlpatterns = [
-    url(r'^', include(router.urls)),
+    url(r'api/', include(router.urls)),
+    path('', view=AssetListView.as_view()),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('home/', view=home),
     path('asset/', include('assets.urls', namespace='asset'),  ),
 ]
 

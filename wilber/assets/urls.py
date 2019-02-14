@@ -15,13 +15,15 @@ Including another URLconf
 """
 
 from django.urls import path, include
-from .views import home
+from .views import *
 
 
-app_name = 'assets'
+app_name = 'asset'
 
 urlpatterns = [
-    path('', name='home', view=home),
+    path('',  view=AssetListView.as_view(), name='list'),
+    path('<int:pk>',  view=AssetDetailView.as_view(), name='detail'),
+    path('add_like/<int:pk>',  view=add_like, name='add_like'),
     ]
 
 

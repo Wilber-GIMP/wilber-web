@@ -26,6 +26,10 @@ class Asset(models.Model):
         return mark_safe('<img src="/media/%s" width="150" height="150" />' % (self.image))
 
     image_tag.short_description = 'Image'
+    
+    def add_like(self):
+        self.num_likes += 1
+        self.save()
 
 
 class Brush(Asset):
