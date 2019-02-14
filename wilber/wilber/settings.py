@@ -43,8 +43,8 @@ THIRD_PARTY_APPS = [
     'rest_framework',
 ]
 LOCAL_APPS = [
-    'asset_sharing',
-    'users',
+    'assets.apps.AssetsConfig',
+    'users.apps.UsersConfig',
 ]
 
 

@@ -19,10 +19,8 @@ from django.urls import path, include
 
 from rest_framework import routers
 
-from asset_sharing.views import home
-from asset_sharing.api import AssetViewSet
-from asset_sharing.api import BrushViewSet
-from asset_sharing.api import PatternViewSet
+from assets.views import *
+from assets.api import *
 
 
 # Routers provide an easy way of automatically determining the URL conf.
@@ -37,7 +35,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('home/', view=home),
-    path('asset/', include('asset_sharing.urls')),
+    path('asset/', include('assets.urls', namespace='asset'),  ),
 ]
 
 

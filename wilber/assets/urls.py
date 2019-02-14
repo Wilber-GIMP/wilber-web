@@ -18,7 +18,7 @@ from django.urls import path, include
 from .views import home
 
 
-
+app_name = 'assets'
 
 urlpatterns = [
     path('', name='home', view=home),

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from asset_sharing.models import Asset, Brush, Pattern
+from .models import Asset, Brush, Pattern
 
 class AssetAdmin(admin.ModelAdmin):
     pass
