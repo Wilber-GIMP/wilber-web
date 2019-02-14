@@ -139,6 +139,8 @@ MEDIA_URL = '/media/'
 #STATIC_ROOT = os.path.join(BASE_DIR,'static')
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
+FILE_UPLOAD_PERMISSIONS = 0o644
+
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR,'static'), # if your static files folder is named "static"
 )  
