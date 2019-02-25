@@ -12,13 +12,16 @@ Create a virtualenv with Python3 and install dependencies:
 
 `
 mkvirtualenv wilber -p /usr/bin/python3
+
 pip install -r wilber-web/wilber/requirements/base.txt`
 
 Create django database and the admin user:
 
 `
 cd wilber-web/wilber
+
 python manage.py migrate
+
 python manage.py createsuperuser --username admin --email admin@wilber.org
 `
 
