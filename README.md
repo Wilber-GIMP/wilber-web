@@ -6,14 +6,14 @@ Gimp Assets Sharing Server
 Install system dependency:
 
 ```bash
-apt install virtualenvwrapper`
+apt install virtualenvwrapper
 ```
 Create a virtualenv with Python3 and install dependencies:
 
 ```bash
 mkvirtualenv wilber -p /usr/bin/python3
 
-pip install -r wilber-web/wilber/requirements/base.txt`
+pip install -r wilber-web/wilber/requirements/base.txt
 ```
 Create django database and the admin user:
 
