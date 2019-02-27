@@ -37,3 +37,9 @@ class Brush(Asset):
 
 class Pattern(Asset):
     pass
+
+class Gradient(Asset):
+    pass
+
+class Plugin(Asset):
+    pass

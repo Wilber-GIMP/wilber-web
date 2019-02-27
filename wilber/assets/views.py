@@ -1,12 +1,25 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.views import generic
+from django.apps import apps
 
 from .models import *
 
 
 class AssetListView(generic.ListView):
     model = Asset
+
+class AssetFilteredListView(generic.ListView):
+    model = Asset
+    context_object_name = 'asset_list'
+    
+    def get_queryset(self):
+        queryset = Asset.objects.all()
+        type = self.kwargs['type']
+        model = apps.get_model('assets', type)
+        
+        queryset = model.objects.all()
+        return queryset
 
 class AssetDetailView(generic.DetailView):
     model = Asset
