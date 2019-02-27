@@ -1,28 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-        <section id="grid" class="grid clearfix">
+        
+        <section class="grid">
+            <div class="row">
             {% for item in asset_list %}
-            <div class="item ">
-                <a href="{% url 'asset:detail' item.pk %}">
-                    <figure>
-                        <img src="{{ item.thumbnail.url }}" />
-                        <figcaption>
-                            <h2>{{ item.name }}</h2>
-                            <p>{{ item.description }}</p>
-                            <button>View</button>
-                        </figcaption>
-                    </figure>
-                </a>
-                <div class="item-atributes">
-                    <a target="_blank" href="{% url 'asset:add_like' item.pk %}"><i class="far fa-heart"></i></a>
-                    <span>{{ item.num_likes }}</span>
-                    <i class="far fa-arrow-alt-circle-down"></i>
-                    <span>{{ item.num_downloads }}</span>
-                    <i class="fas fa-share-alt"></i>
-                    <span>{{ item.num_shares }}</span>
+                <div class="col-4">
+                    <a href="{% url 'asset:detail' item.pk %}">
+                        <figure>
+                            <img src="{{ item.thumbnail.url }}" />
+                            <figcaption>
+                                <h2>{{ item.name }}</h2>
+                                <p>{{ item.description }}</p>
+                                <button>View</button>
+                            </figcaption>
+                        </figure>
+                    </a>
+                    <div class="item-atributes">
+                        <a target="_blank" href="{% url 'asset:add_like' item.pk %}"><i class="far fa-heart"></i></a>
+                        <span>{{ item.num_likes }}</span>
+                        <i class="far fa-arrow-alt-circle-down"></i>
+                        <span>{{ item.num_downloads }}</span>
+                        <i class="fas fa-share-alt"></i>
+                        <span>{{ item.num_shares }}</span>
+                    </div>
                 </div>
-            </div>
             {% endfor %}
+            </div>
         </section>
 {% endblock content %}
