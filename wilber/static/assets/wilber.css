@@ -12,13 +12,16 @@ body{
 }
 .head .type-buttons{
     cursor: pointer;
-    padding: .7em 3em;
-    margin-left: 1.5em;
+    padding: .7em 2em;
+    margin-left: 0.5em;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: bold;
     border: 3px solid #fff;
     background: transparent;
+}
+.head a{
+    text-decoration: none;
 }
 .btn{
     position: relative;
@@ -35,21 +38,12 @@ body{
     position: absolute;
     transition: all 0.3s ease 0s;
     z-index: -1;
-    background: green;
+    background: white;
     top:0; bottom: 0; left: 0; right: 100%;
 }
 .btn:hover:after, .btn:focus:after {
     right:0;
 }
-
-a.button {
-    color: #fff;
-}
-
-a.button:hover{
-    color: pink;
-}
-
 
 .grid{
     margin-top: 1em;
