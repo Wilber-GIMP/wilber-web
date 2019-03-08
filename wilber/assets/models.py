@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 User = settings.AUTH_USER_MODEL
@@ -9,6 +11,7 @@ class Asset(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=300)
 
+    file = models.FileField(upload_to = 'assets/', null=True, blank=True)
     image = models.ImageField(upload_to = 'images/', default = 'images/none/no-img.jpg', null=True, blank=True)
     thumbnail = models.ImageField(upload_to = 'thumbnails/', default = 'images/none/no-thumb.jpg', null=True, blank=True)
     
@@ -18,6 +21,9 @@ class Asset(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def get_absolute_url(self):
+        return reverse('asset:detail', kwargs={'pk': self.pk})
     
     def __str__(self):
         return self.name

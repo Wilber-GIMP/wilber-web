@@ -23,6 +23,17 @@ class AssetFilteredListView(generic.ListView):
 
 class AssetDetailView(generic.DetailView):
     model = Asset
+    
+
+
+
+class AssetCreate(generic.CreateView):
+    model = Asset
+    fields = ['name', 'description', 'thumbnail', 'file']
+    
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
 
 def add_like(request, pk):

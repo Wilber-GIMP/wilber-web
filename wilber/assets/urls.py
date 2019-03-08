@@ -21,6 +21,7 @@ from .views import *
 app_name = 'asset'
 
 urlpatterns = [
+    path('add', view=AssetCreate.as_view(), name='add'),
     path('',  view=AssetListView.as_view(), name='all'),
     path('<int:pk>',  view=AssetDetailView.as_view(), name='detail'),
     path('<str:type>',  view=AssetFilteredListView.as_view(), name='type'),
