@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.core.files.storage import default_storage
 
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -12,6 +13,8 @@ class Asset(models.Model):
     description = models.CharField(max_length=300)
 
     file = models.FileField(upload_to = 'assets/', null=True, blank=True)
+    filesize = models.IntegerField(default=0)
+    
     image = models.ImageField(upload_to = 'images/', default = 'images/none/no-img.jpg', null=True, blank=True)
     thumbnail = models.ImageField(upload_to = 'thumbnails/', default = 'images/none/no-thumb.jpg', null=True, blank=True)
     
@@ -24,6 +27,15 @@ class Asset(models.Model):
     
     def get_absolute_url(self):
         return reverse('asset:detail', kwargs={'pk': self.pk})
+        
+    def save(self, *args, **kwargs):
+        self.filesize = self.get_size()
+        super(Asset, self).save(*args, **kwargs)
+        
+    def get_size(self):
+        if self.file:
+            return default_storage.size(self.file.path)
+        return 0
     
     def __str__(self):
         return self.name

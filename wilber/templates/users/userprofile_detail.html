@@ -19,4 +19,32 @@
         <p>City: {{profile.city}}</p>
         <p>Country: {{profile.country}}</p>
         
+        
+        <h1>My Assets:</h1>
+        <table>
+            <thead>
+            <tr>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Size</th>
+            </tr>
+            </thead>
+            
+            <tbody>
+                {% for object in asset_list %}
+                <tr>
+                    <td>{{object.type}}</td>
+                    <td>{{object.name}}</td>
+                    <td>{{object.filesize|filesizeformat}}</td>
+                </tr>
+                {% endfor %}
+                <td></td>
+                <td>TOTAL</td>
+                <td>{{filesize__sum|filesizeformat}}</td>
+            </tbody>
+        </table>
+        
+        <h1>Quota</h1>
+        
+        
 {% endblock content %}

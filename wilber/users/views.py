@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views import generic
 
-
+from django.db.models import Sum
 from django.urls import reverse_lazy
 
 from django.contrib.auth import logout
@@ -25,6 +25,15 @@ class UserDetailView(generic.DetailView):
 class UserMyProfileView(generic.DetailView):
     model = UserProfile
     context_object_name = 'profile'
+    
+    def get_context_data(self, **kwargs):
+        context = super(UserMyProfileView, self).get_context_data(**kwargs)
+        
+        context['asset_list']= self.object.user.assets.all()
+        context['filesize__sum']= self.object.user.assets.all().aggregate(Sum('filesize'))['filesize__sum']
+        
+        #ModelName.objects.filter(field_name__isnull=True).aggregate(Sum('field_name'))
+        return context
 
     def get_object(self):
         return UserProfile.objects.get(user=self.request.user)

@@ -52,6 +52,7 @@ THIRD_PARTY_APPS = [
 if DEBUG == True:
     THIRD_PARTY_APPS += [
         'debug_toolbar',
+        'django_extensions',
     ]
     
 
