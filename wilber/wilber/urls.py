@@ -17,8 +17,12 @@ from django.contrib import admin
 from django.conf.urls import url
 from django.urls import path, include
 from django.conf import settings
+from django.contrib.auth import views as auth_views
+
 from rest_framework import routers
 
+
+from users.views import SignupView
 from assets.views import *
 from assets.api import *
 
@@ -32,10 +36,13 @@ router.register(r'patterns', PatternViewSet)
 
 urlpatterns = [
     url(r'api/', include(router.urls)),
+    url(r'^accounts/signup', SignupView.as_view()),
+    url(r'^accounts/', include('allauth.urls')),
     path('', view=AssetListView.as_view()),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('asset/', include('assets.urls', namespace='asset'),  ),
+    path('user/', include('users.urls', namespace='user'),  ),
 ]
 
 
@@ -43,3 +50,9 @@ if settings.DEBUG:
     from django.conf.urls.static import static
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    
+    
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns

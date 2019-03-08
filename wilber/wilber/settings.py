@@ -26,6 +26,7 @@ SECRET_KEY = '2e3f#bpw&w7p^51h^2x53i411@53gtx9%^obvf82(md*@qt%6b'
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', '104.248.232.184']
+INTERNAL_IPS = ['127.0.0.1', ]
 
 
 # Application definition
@@ -37,21 +38,36 @@ DJANGO_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 ]
 
 THIRD_PARTY_APPS = [
     'rest_framework',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    #'allauth.socialaccount.providers.openid',
 ]
+
+if DEBUG == True:
+    THIRD_PARTY_APPS += [
+        'debug_toolbar',
+    ]
+    
+
 LOCAL_APPS = [
     'assets.apps.AssetsConfig',
     'users.apps.UsersConfig',
 ]
 
+SITE_ID = 1
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 
 AUTH_USER_MODEL = 'users.User'
+
+ACCOUNT_FORMS = {'signup': 'users.forms.MyCustomSignupForm'}
 
 
 MIDDLEWARE = [
@@ -64,6 +80,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+if DEBUG == True:
+    MIDDLEWARE += [
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    ]
+    
 ROOT_URLCONF = 'wilber.urls'
 
 TEMPLATES = [
@@ -114,6 +135,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+# All Auth
+
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/

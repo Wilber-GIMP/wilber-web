@@ -3,6 +3,7 @@ from django.db import models
 from django.core import validators
 from django.utils import timezone
 from django.core.mail import send_mail
+from django.urls import reverse
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
@@ -91,7 +92,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     
-    photo = models.FileField(verbose_name=_("Profile Picture"), upload_to="profiles", max_length=255, null=True, blank=True)
+    photo = models.ImageField(verbose_name=_("Profile Picture"), upload_to="profiles", default = 'profiles/none/no-img.jpg', max_length=255, null=True, blank=True)
     
     phone = models.CharField(max_length=20, blank=True, default='')
     bio = models.TextField(default='', blank=True)
@@ -105,6 +106,9 @@ class UserProfile(models.Model):
     
     city = models.CharField(max_length=100, default='', blank=True)
     country = models.CharField(max_length=100, default='', blank=True)
+    
+    def get_absolute_url(self):
+        return reverse('user:detail', kwargs={'username': self.user.username})
     
     def __str__(self):
         return self.user.username

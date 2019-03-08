@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <h1>USERNAME: {{profile.user.username}}</h1>
+        
+        {% if request.user == profile.user %}
+        <h2><a href="{% url 'user:edit' %}">EDIT</a></h2>
+        {% endif %}
+        
+        <p>Name: {{profile.user.get_full_name}}</p>
+        
+        PHOTO: {% if profile.photo %}<img src="{{ profile.photo.url }}" > {% endif %}
+        <p>Bio: {{profile.bio}}</p>
+        <p>Organization: {{profile.organization}}</p>
+        <p>Website: {{profile.website}}</p>
+        <p>Facebook: {{profile.facebook}}</p>
+        <p>Instagram: {{profile.instagram}}</p>
+        <p>Birthday: {{profile.birthday}}</p>
+        <p>City: {{profile.city}}</p>
+        <p>Country: {{profile.country}}</p>
+        
+{% endblock content %}

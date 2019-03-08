@@ -6,4 +6,12 @@
             <a class="type-buttons btn" href="{% url 'asset:type' 'gradient' %}" class="button">Gradients</a>
             <a class="type-buttons btn" href="{% url 'asset:type' 'plugin' %}" class="button">Images</a>
         </div>
+        <div>
+            {% if user.is_authenticated %}
+            <a class="type-buttons btn" href="{% url 'user:profile' %}">Profile</a>
+            <a class="type-buttons btn" href="{% url 'account_logout' %}">Logout {{user.username}}</a>
+            {% else %}
+            <a class="type-buttons btn" href="{% url 'account_login' %}">Login</a>
+            {% endif %}
+        </div>
     </div>
