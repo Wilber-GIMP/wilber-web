@@ -1,4 +1,6 @@
 from rest_framework import serializers, viewsets
+from rest_framework.permissions import IsAuthenticated
+
 
 from .models import Asset, Brush, Pattern
 
@@ -7,36 +9,24 @@ from .models import Asset, Brush, Pattern
 class AssetSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Asset
-        fields = ('name', 'description')
+        fields = ('type', 'name', 'description', 'image', 'file')
 
 # ViewSets define the view behavior.
 class AssetViewSet(viewsets.ModelViewSet):
+    #permission_classes = (IsAuthenticated,)
     queryset = Asset.objects.all()
     serializer_class = AssetSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
-
-# Serializers define the API representation.
-class BrushSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Asset
-        fields = ('name', 'description')
-
-# ViewSets define the view behavior.
-class BrushViewSet(viewsets.ModelViewSet):
-    queryset = Brush.objects.all()
-    serializer_class = BrushSerializer
-
-
-
-
-# Serializers define the API representation.
-class PatternSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Pattern
-        fields = ('name', 'description')
-
-# ViewSets define the view behavior.
-class PatternViewSet(viewsets.ModelViewSet):
-    queryset = Pattern.objects.all()
-    serializer_class = PatternSerializer
+    def get_queryset(self):
+        """
+        Optionally restricts the returned purchases to a given user,
+        by filtering against a `username` query parameter in the URL.
+        """
+        queryset = Asset.objects.all()
+        type = self.request.query_params.get('type', None)
+        if type is not None:
+            queryset = queryset.filter(type=type)
+        return queryset

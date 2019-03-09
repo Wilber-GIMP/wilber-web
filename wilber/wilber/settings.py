@@ -43,6 +43,9 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',
+    'rest_framework.authtoken',
+    #'rest_auth',
+    #'rest_auth.registration',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -54,7 +57,7 @@ if DEBUG == True:
         'debug_toolbar',
         'django_extensions',
     ]
-    
+
 
 LOCAL_APPS = [
     'assets.apps.AssetsConfig',
@@ -85,7 +88,7 @@ if DEBUG == True:
     MIDDLEWARE += [
         'debug_toolbar.middleware.DebugToolbarMiddleware',
     ]
-    
+
 ROOT_URLCONF = 'wilber.urls'
 
 TEMPLATES = [
@@ -181,7 +184,7 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR,'static'), # if your static files folder is named "static"
-)  
+)
 
 
 
@@ -189,7 +192,19 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-        #'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+        #'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly'
+    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }
+
+
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025

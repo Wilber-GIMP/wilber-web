@@ -5,10 +5,26 @@ from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
+
+from django.db.models import signals
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 User = settings.AUTH_USER_MODEL
 
 class Asset(models.Model):
+    ASSET_TYPES = [
+        ('brush', 'Brush'),
+        ('pattern', 'Pattern'),
+        ('gradient', 'Gradient'),
+        ('plugin', 'Plugin'),
+    ]
+    
+    
     owner = models.ForeignKey(User, related_name='assets', on_delete=models.CASCADE)
+    type = models.CharField(max_length=9,
+                  choices=ASSET_TYPES,)
+                  
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=300)
 
@@ -28,11 +44,8 @@ class Asset(models.Model):
     def get_absolute_url(self):
         return reverse('asset:detail', kwargs={'pk': self.pk})
         
-    def save(self, *args, **kwargs):
-        self.filesize = self.get_size()
-        super(Asset, self).save(*args, **kwargs)
         
-    def get_size(self):
+    def get_filesize(self):
         if self.file:
             return default_storage.size(self.file.path)
         return 0
@@ -61,3 +74,15 @@ class Gradient(Asset):
 
 class Plugin(Asset):
     pass
+
+
+
+
+@receiver(post_save, sender=Asset)    
+def update_filesize(sender, **kwargs):
+    asset = kwargs["instance"]
+    asset.filesize = asset.get_filesize()
+    
+    signals.post_save.disconnect(update_filesize, sender=Asset)
+    asset.save()
+    signals.post_save.connect(update_filesize, sender=Asset)

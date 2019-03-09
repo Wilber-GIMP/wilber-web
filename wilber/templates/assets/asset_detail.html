@@ -23,8 +23,9 @@
                 </div>
             </div>
             
-            
+            {% if object.file %}
             <h1><a href={{ object.file.url }}>DOWNLOAD</a></h1>
+            {% endif %} 
             
         </section>
 {% endblock content %}

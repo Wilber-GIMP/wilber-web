@@ -14,11 +14,8 @@ class AssetFilteredListView(generic.ListView):
     context_object_name = 'asset_list'
     
     def get_queryset(self):
-        queryset = Asset.objects.all()
         type = self.kwargs['type']
-        model = apps.get_model('assets', type)
-        
-        queryset = model.objects.all()
+        queryset = Asset.objects.filter(type=type)
         return queryset
 
 class AssetDetailView(generic.DetailView):
