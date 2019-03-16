@@ -29,12 +29,14 @@ from assets.api import *
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
-router.register(r'assets', AssetViewSet)
+router.register(r'asset', AssetViewSet)
+router.register(r'user', UserViewSet)
+router.register(r'profile', UserProfileViewSet)
 
 
 urlpatterns = [
     url(r'api/', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls')),
+    #path('api-auth/', include('rest_framework.urls')),
     url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
     url(r'^accounts/signup', SignupView.as_view()),

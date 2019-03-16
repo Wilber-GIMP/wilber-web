@@ -3,19 +3,91 @@ from rest_framework.permissions import IsAuthenticated
 
 
 from .models import Asset, Brush, Pattern
+from users.models import User, UserProfile
+
+class MultiSerializerViewSetMixin(object):
+    def get_serializer_class(self):
+        """
+        Look for serializer class in self.serializer_action_classes, which
+        should be a dict mapping action name (key) to serializer class (value),
+        i.e.:
+
+        class MyViewSet(MultiSerializerViewSetMixin, ViewSet):
+            serializer_class = MyDefaultSerializer
+            serializer_action_classes = {
+               'list': MyListSerializer,
+               'my_action': MyActionSerializer,
+            }
+
+            @action
+            def my_action:
+                ...
+
+        If there's no entry for that action then just fallback to the regular
+        get_serializer_class lookup: self.serializer_class, DefaultSerializer.
+
+        """
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super(MultiSerializerViewSetMixin, self).get_serializer_class()
 
 
-# Serializers define the API representation.
+
+
+class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    profile = UserProfileSerializer(read_only=True)
+    assets = serializers.HyperlinkedRelatedField(many=True, view_name='asset-detail', read_only=True)
+
+    class Meta:
+        model = User
+        exclude = ['password']
+
+class UserInlineSerializer(serializers.HyperlinkedModelSerializer):
+    profile = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        exclude = ['password']
+
+class UserListSerializer(serializers.HyperlinkedModelSerializer):
+    #profile = UserProfileSerializer(read_only=True)
+    #assets = serializers.HyperlinkedRelatedField(many=True, view_name='asset-detail', read_only=True)
+    class Meta:
+        model = User
+        fields = ['id', 'url', 'name', 'username']
+
+
+
+
 class AssetSerializer(serializers.HyperlinkedModelSerializer):
+    owner = UserInlineSerializer(read_only=True)
     class Meta:
         model = Asset
-        fields = ('type', 'name', 'description', 'image', 'file')
+        fields = '__all__'
 
-# ViewSets define the view behavior.
-class AssetViewSet(viewsets.ModelViewSet):
+
+class AssetListSerializer(serializers.HyperlinkedModelSerializer):
+    username = serializers.CharField(source='owner', read_only=True)
+
+    class Meta:
+        model = Asset
+        fields = '__all__'
+
+
+class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet ):
     #permission_classes = (IsAuthenticated,)
     queryset = Asset.objects.all()
     serializer_class = AssetSerializer
+
+    serializer_action_classes = {
+        'list': AssetListSerializer,
+    }
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -30,3 +102,18 @@ class AssetViewSet(viewsets.ModelViewSet):
         if type is not None:
             queryset = queryset.filter(type=type)
         return queryset
+
+
+class UserViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
+    serializer_action_classes = {
+        'list': UserListSerializer,
+    }
+    #permission_classes = (IsAuthenticated,)
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    #permission_classes = (IsAuthenticated,)
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
