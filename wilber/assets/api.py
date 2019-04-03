@@ -2,7 +2,7 @@ from rest_framework import serializers, viewsets
 from rest_framework.permissions import IsAuthenticated
 
 
-from .models import Asset, Brush, Pattern
+from .models import *
 from users.models import User, UserProfile
 
 class MultiSerializerViewSetMixin(object):
@@ -33,8 +33,6 @@ class MultiSerializerViewSetMixin(object):
             return super(MultiSerializerViewSetMixin, self).get_serializer_class()
 
 
-
-
 class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UserProfile
@@ -43,17 +41,17 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     profile = UserProfileSerializer(read_only=True)
     assets = serializers.HyperlinkedRelatedField(many=True, view_name='asset-detail', read_only=True)
-
+    
     class Meta:
         model = User
-        exclude = ['password']
+        exclude = ['password', 'user_permissions']
 
 class UserInlineSerializer(serializers.HyperlinkedModelSerializer):
     profile = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = User
-        exclude = ['password']
+        exclude = ['password', 'user_permissions']
 
 class UserListSerializer(serializers.HyperlinkedModelSerializer):
     #profile = UserProfileSerializer(read_only=True)
@@ -64,15 +62,35 @@ class UserListSerializer(serializers.HyperlinkedModelSerializer):
 
 
 
+class UserViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
+    serializer_action_classes = {
+        'list': UserListSerializer,
+    }
+    #permission_classes = (IsAuthenticated,)
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    #permission_classes = (IsAuthenticated,)
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+
+
+
+
+
 
 class AssetSerializer(serializers.HyperlinkedModelSerializer):
     owner = UserInlineSerializer(read_only=True)
+    id = serializers.ReadOnlyField()
     class Meta:
         model = Asset
         fields = '__all__'
 
 
 class AssetListSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField()
     username = serializers.CharField(source='owner', read_only=True)
 
     class Meta:
@@ -103,17 +121,3 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet ):
             queryset = queryset.filter(type=type)
         return queryset
 
-
-class UserViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
-    serializer_action_classes = {
-        'list': UserListSerializer,
-    }
-    #permission_classes = (IsAuthenticated,)
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-
-class UserProfileViewSet(viewsets.ModelViewSet):
-    #permission_classes = (IsAuthenticated,)
-    queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer

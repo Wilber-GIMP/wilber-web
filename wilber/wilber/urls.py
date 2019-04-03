@@ -33,7 +33,6 @@ router.register(r'asset', AssetViewSet)
 router.register(r'user', UserViewSet)
 router.register(r'profile', UserProfileViewSet)
 
-
 urlpatterns = [
     url(r'api/', include(router.urls)),
     #path('api-auth/', include('rest_framework.urls')),

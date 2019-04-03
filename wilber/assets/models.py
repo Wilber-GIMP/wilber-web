@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 from django.conf import settings
 from django.core.files.storage import default_storage
@@ -11,6 +13,15 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 User = settings.AUTH_USER_MODEL
+
+
+def get_image_path(instance, filename):
+    return os.path.join('images', str(instance.type), filename)
+
+def get_file_path(instance, filename):
+    return os.path.join('assets', str(instance.type), filename)
+
+
 
 class Asset(models.Model):
     ASSET_TYPES = [
@@ -28,11 +39,10 @@ class Asset(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=300)
 
-    file = models.FileField(upload_to = 'assets/', null=True, blank=True)
+    file = models.FileField(upload_to = get_file_path, null=True, blank=True)
     filesize = models.IntegerField(default=0)
     
-    image = models.ImageField(upload_to = 'images/', default = 'images/none/no-img.jpg', null=True, blank=True)
-    thumbnail = models.ImageField(upload_to = 'thumbnails/', default = 'images/none/no-thumb.jpg', null=True, blank=True)
+    image = models.ImageField(upload_to = get_image_path, default = 'images/none/no-img.jpg', null=True, blank=True)
     
     num_likes = models.PositiveIntegerField(default=0)
     num_downloads = models.PositiveIntegerField(default=0)
@@ -43,8 +53,7 @@ class Asset(models.Model):
     
     def get_absolute_url(self):
         return reverse('asset:detail', kwargs={'pk': self.pk})
-        
-        
+
     def get_filesize(self):
         if self.file:
             return default_storage.size(self.file.path)
@@ -61,19 +70,6 @@ class Asset(models.Model):
     def add_like(self):
         self.num_likes += 1
         self.save()
-
-
-class Brush(Asset):
-    pass
-
-class Pattern(Asset):
-    pass
-
-class Gradient(Asset):
-    pass
-
-class Plugin(Asset):
-    pass
 
 
 

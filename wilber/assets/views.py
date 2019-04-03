@@ -26,7 +26,7 @@ class AssetDetailView(generic.DetailView):
 
 class AssetCreate(generic.CreateView):
     model = Asset
-    fields = ['name', 'description', 'thumbnail', 'file']
+    fields = ['name', 'description', 'image', 'file']
     
     def form_valid(self, form):
         form.instance.owner = self.request.user
