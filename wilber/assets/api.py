@@ -84,17 +84,25 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 class AssetSerializer(serializers.HyperlinkedModelSerializer):
     owner = UserInlineSerializer(read_only=True)
     id = serializers.ReadOnlyField()
+    type = serializers.StringRelatedField(many=False)
+    #'image_count' = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
+
     class Meta:
         model = Asset
+        
         fields = '__all__'
 
 
 class AssetListSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
     username = serializers.CharField(source='owner', read_only=True)
-
+    type = serializers.StringRelatedField(many=False)
+    folder = serializers.ReadOnlyField()
+    
     class Meta:
         model = Asset
+    
+        fields = ['id', 'username', 'type', 'folder', ]
         fields = '__all__'
 
 

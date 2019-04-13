@@ -21,8 +21,10 @@ class AssetAdmin(admin.ModelAdmin):
         return sizeof_fmt(obj.filesize)
     
     readonly_fields = ('image_tag',)
-    list_display = ['name', 'type',  'owner', 'get_filesize']
-    list_filter = ['type',]
+    list_display = ['name',   'owner', 'get_filesize']
+    search_fields = ['name']
+    #list_filter = ['type',]
     
     
 admin.site.register(Asset, AssetAdmin)
+admin.site.register(AssetType)

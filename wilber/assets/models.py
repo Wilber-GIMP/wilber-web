@@ -23,21 +23,33 @@ def get_file_path(instance, filename):
 
 
 
+class AssetType(models.Model):
+    name = models.CharField(max_length=32)
+    folder = models.CharField(max_length=32)
+    
+    def __str__(self):
+        return self.name
+        
+    def __repr__(self):
+        return self.folder
+    
+
 class Asset(models.Model):
     ASSET_TYPES = [
-        ('brush', 'Brush'),
-        ('pattern', 'Pattern'),
-        ('gradient', 'Gradient'),
-        ('plugin', 'Plugin'),
+        ('brushes', 'Brush'),
+        ('patterns', 'Pattern'),
+        ('gradients', 'Gradient'),
+        ('plug-ins', 'Plug-in'),
     ]
     
     
     owner = models.ForeignKey(User, related_name='assets', on_delete=models.CASCADE)
-    type = models.CharField(max_length=9,
-                  choices=ASSET_TYPES,)
+    #type2 = models.CharField(max_length=9,
+    #              choices=ASSET_TYPES,)
+    type = models.ForeignKey('AssetType', on_delete=models.CASCADE, null=True)
                   
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=300)
+    description = models.CharField(max_length=1000)
 
     file = models.FileField(upload_to = get_file_path, null=True, blank=True)
     filesize = models.IntegerField(default=0)
@@ -50,6 +62,9 @@ class Asset(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def folder(self):
+        return self.type.folder
     
     def get_absolute_url(self):
         return reverse('asset:detail', kwargs={'pk': self.pk})
