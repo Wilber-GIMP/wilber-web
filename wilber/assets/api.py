@@ -1,6 +1,7 @@
-from rest_framework import serializers, viewsets
-from rest_framework.permissions import IsAuthenticated
-
+from rest_framework import serializers, viewsets, generics
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from .models import *
 from users.models import User, UserProfile
@@ -78,14 +79,32 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 
 
+class LikeSerializer(serializers.ModelSerializer):
+    #view_name = 'like-detail'
+    #user = serializers.StringRelatedField(default=serializers.CurrentUserDefault(), read_only=True)
+    
+    user = serializers.HyperlinkedRelatedField(read_only=True, view_name='user-detail')
+    username = serializers.CharField(source='user', read_only=True)
+    name = serializers.CharField(source='user.get_full_name', read_only=True)
+    photo = serializers.CharField(source='user.profile.photo', read_only=True)
+    #asset = serializers.PrimaryKeyRelatedField(read_only=True)
+    
+    class Meta:
+        model = Like
+        #fields = ('__all__')
+        fields = ('user', 'username', 'name', 'photo')
 
 
 
 class AssetSerializer(serializers.HyperlinkedModelSerializer):
     owner = UserInlineSerializer(read_only=True)
     id = serializers.ReadOnlyField()
-    type = serializers.StringRelatedField(many=False)
-    #'image_count' = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
+    filesize = serializers.ReadOnlyField()
+    num_likes = serializers.ReadOnlyField()
+    num_downloads = serializers.ReadOnlyField()
+    num_shares = serializers.ReadOnlyField()
+    
+    likes = LikeSerializer(source='liked', many=True, read_only=True)
 
     class Meta:
         model = Asset
@@ -96,14 +115,12 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
 class AssetListSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
     username = serializers.CharField(source='owner', read_only=True)
-    type = serializers.StringRelatedField(many=False)
-    folder = serializers.ReadOnlyField()
+    
     
     class Meta:
         model = Asset
     
-        fields = ['id', 'username', 'type', 'folder', ]
-        fields = '__all__'
+        fields = ['id', 'url', 'username', 'type', 'name', 'image', 'file', 'num_likes' ]
 
 
 class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet ):
@@ -128,4 +145,33 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet ):
         if type is not None:
             queryset = queryset.filter(type=type)
         return queryset
+        
+    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    def like(self, request, pk=None):
+        asset = self.get_object()
+        user = request.user
+        like, created = asset.do_like(user)
+        asset.refresh_from_db()
+        
+        if created:
+            status = 'liked by %s' % user
+        else:
+            status = 'already liked by %s at %s' % (user, like.timestamp)
+            
+        return Response({'status':status, 'likes':asset.num_likes})
+    
+    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    def unlike(self, request, pk=None):
+        asset = self.get_object()
+        user = request.user
+        
+        unliked = asset.unlike(user)
+        asset.refresh_from_db()
+        
+        if unliked:
+            status = 'unliked'
+        else:
+            status = 'this asset was not liked by this user'
+            
+        return Response({'status':status, 'likes':asset.num_likes})
 

@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
+
+from django.db.transaction import atomic
 # Register your models here.
 from .models import *
 
@@ -14,6 +16,15 @@ def sizeof_fmt(num, suffix='B'):
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
 
+@atomic
+def recalculate_likes(modeladmin, request, queryset):
+    for asset in queryset:
+        asset.num_likes = asset.calculate_likes()
+        asset.save()
+recalculate_likes.short_description = "Recalculate number of likes of each asset"
+
+
+
 class AssetAdmin(admin.ModelAdmin):
     
     @field('filesize', 'filesize')
@@ -21,10 +32,21 @@ class AssetAdmin(admin.ModelAdmin):
         return sizeof_fmt(obj.filesize)
     
     readonly_fields = ('image_tag',)
-    list_display = ['name',   'owner', 'get_filesize']
+    list_display = ['name', 'type', 'owner', 'get_filesize', 'num_likes']
     search_fields = ['name']
     #list_filter = ['type',]
+    actions = [recalculate_likes]
+
+
+
+
+
+class LikeAdmin(admin.ModelAdmin):
+    list_display = ['asset', 'user', 'timestamp']
+    search_fields = ['asset', 'user']
+    
     
     
 admin.site.register(Asset, AssetAdmin)
 admin.site.register(AssetType)
+admin.site.register(Like, LikeAdmin)
