@@ -99,6 +99,7 @@ class LikeSerializer(serializers.ModelSerializer):
 class AssetSerializer(serializers.HyperlinkedModelSerializer):
     owner = UserInlineSerializer(read_only=True)
     id = serializers.ReadOnlyField()
+    folder = serializers.ReadOnlyField()
     filesize = serializers.ReadOnlyField()
     num_likes = serializers.ReadOnlyField()
     num_downloads = serializers.ReadOnlyField()
@@ -114,13 +115,15 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
 
 class AssetListSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
+    
+    folder = serializers.ReadOnlyField()
     username = serializers.CharField(source='owner', read_only=True)
     
     
     class Meta:
         model = Asset
     
-        fields = ['id', 'url', 'username', 'type', 'name', 'image', 'file', 'num_likes' ]
+        fields = ['id', 'url', 'username', 'category', 'name', 'image', 'file', 'folder', 'num_likes' ]
 
 
 class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet ):
@@ -174,4 +177,20 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet ):
             status = 'this asset was not liked by this user'
             
         return Response({'status':status, 'likes':asset.num_likes})
+        
+    @action(detail=True, methods=['get'])
+    def download(self, request, pk=None):
+        asset = self.get_object()
+        user = request.user
+        num_downloads = asset.download()
+        asset.refresh_from_db()
+        
+        if user:
+            status = 'Downloaded by user:%s' % (user) 
+        else:
+            status = 'Downloaded by anon' 
+            
+        return Response({'status':status, 'downloads':asset.num_downloads})
+        
+
 

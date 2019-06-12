@@ -23,19 +23,11 @@ def get_file_path(instance, filename):
 
 
 
-class AssetType(models.Model):
-    name = models.CharField(max_length=32)
-    folder = models.CharField(max_length=32)
-    
-    def __str__(self):
-        return self.name
-        
-    def __repr__(self):
-        return self.folder
+
     
 
 class Asset(models.Model):
-    ASSET_TYPES = [
+    CATEGORIES = [
         ('brushes', 'Brush'),
         ('patterns', 'Pattern'),
         ('gradients', 'Gradient'),
@@ -44,7 +36,7 @@ class Asset(models.Model):
     
     
     owner = models.ForeignKey(User, related_name='assets', on_delete=models.CASCADE)
-    type = models.CharField(max_length=9, choices=ASSET_TYPES)
+    category = models.CharField(max_length=9, choices=CATEGORIES)
     #type = models.ForeignKey('AssetType', on_delete=models.CASCADE, null=True)
                   
     name = models.CharField(max_length=100)
@@ -64,7 +56,7 @@ class Asset(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def folder(self):
-        return self.type
+        return self.category
     
     def get_absolute_url(self):
         return reverse('asset:detail', kwargs={'pk': self.pk})
@@ -84,6 +76,11 @@ class Asset(models.Model):
     
     def calculate_likes(self):
         return self.likes.all().count()
+        
+    def download(self):
+        self.num_downloads +=1
+        self.save()
+        return self.num_downloads
     
     def do_like(self, user):
         like, created = Like.objects.get_or_create(user=user, asset=self)

@@ -32,7 +32,7 @@ class AssetAdmin(admin.ModelAdmin):
         return sizeof_fmt(obj.filesize)
     
     readonly_fields = ('image_tag',)
-    list_display = ['name', 'type', 'owner', 'get_filesize', 'num_likes']
+    list_display = ['name', 'category', 'owner', 'get_filesize', 'num_likes']
     search_fields = ['name']
     #list_filter = ['type',]
     actions = [recalculate_likes]
@@ -48,5 +48,5 @@ class LikeAdmin(admin.ModelAdmin):
     
     
 admin.site.register(Asset, AssetAdmin)
-admin.site.register(AssetType)
+#admin.site.register(AssetType)
 admin.site.register(Like, LikeAdmin)
