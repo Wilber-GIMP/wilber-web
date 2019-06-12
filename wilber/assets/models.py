@@ -16,10 +16,10 @@ User = settings.AUTH_USER_MODEL
 
 
 def get_image_path(instance, filename):
-    return os.path.join('images', str(instance.type), filename)
+    return os.path.join('images', str(instance.folder()), filename)
 
 def get_file_path(instance, filename):
-    return os.path.join('assets', str(instance.type), filename)
+    return os.path.join('assets', str(instance.folder()), filename)
 
 
 
@@ -103,7 +103,7 @@ class Like(models.Model):
         unique_together = ('user', 'asset')
     
     def __str__(self):
-        return f'{self.user.username} likes \'{self.asset.name}\''
+        return f'{self.user.username} likes {self.asset.name}'
         
 
 

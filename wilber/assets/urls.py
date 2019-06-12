@@ -22,7 +22,7 @@ app_name = 'asset'
 
 urlpatterns = [
     path('add', view=AssetCreate.as_view(), name='add'),
-    path('',  view=AssetListView.as_view(), name='all'),
+    path('',  view=AssetListView.as_view(), name='list'),
     path('<int:pk>',  view=AssetDetailView.as_view(), name='detail'),
     path('<str:type>',  view=AssetFilteredListView.as_view(), name='type'),
     path('add_like/<int:pk>',  view=add_like, name='add_like'),
