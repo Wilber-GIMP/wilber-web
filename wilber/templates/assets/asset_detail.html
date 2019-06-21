@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load asset_tags %}
+
 {% block content %}
         <section id="grid" class="grid clearfix">
             <div class="item ">
@@ -14,7 +16,13 @@
                     </figure>
                 </a>
                 <div class="item-atributes">
-                    <a target="_blank" href="{% url 'asset:add_like' object.pk %}"><i class="far fa-heart"></i></a>
+                    {% asset_liked object request.user as is_liked %}
+                        {% if is_liked  %}
+                        <a href="#" onclick="do_unlike({{object.pk}});" ><i class="fas fa-heart"></i></a>
+                        {% else %}
+                        <a href="#" onclick="do_like({{object.pk}});" ><i class="far fa-heart"></i></a>
+                        {% endif %}
+
                     <span>{{ object.num_likes }}</span>
                     <i class="far fa-arrow-alt-circle-down"></i>
                     <span>{{ object.num_downloads }}</span>
@@ -22,10 +30,10 @@
                     <span>{{ object.num_shares }}</span>
                 </div>
             </div>
-            
+
             {% if object.file %}
             <h1><a href={{ object.file.url }}>DOWNLOAD</a></h1>
-            {% endif %} 
-            
+            {% endif %}
+
         </section>
 {% endblock content %}
