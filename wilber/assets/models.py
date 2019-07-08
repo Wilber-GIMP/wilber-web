@@ -108,7 +108,7 @@ class Like(models.Model):
         unique_together = ('user', 'asset')
 
     def __str__(self):
-        return f'{self.user.username} likes {self.asset.name}'
+        return "%s likes %s"%(self.user.username, self.asset.name)
 
 
 
