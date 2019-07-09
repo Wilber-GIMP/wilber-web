@@ -19,6 +19,8 @@ from django.urls import path, include
 from django.conf import settings
 from django.contrib.auth import views as auth_views
 
+
+from django.views.generic import TemplateView
 from rest_framework import routers
 
 
@@ -40,12 +42,14 @@ urlpatterns = [
     url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
     url(r'^accounts/signup', SignupView.as_view()),
     url(r'^accounts/', include('allauth.urls')),
-    path('', view=AssetListView.as_view()),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('asset/', include('assets.urls', namespace='asset'),  ),
     path('user/', include('users.urls', namespace='user'),  ),
+    path('', TemplateView.as_view(template_name='index.html'))
 ]
+
+
 
 
 if settings.DEBUG:
