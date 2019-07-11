@@ -42,11 +42,13 @@ urlpatterns = [
     url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
     url(r'^accounts/signup', SignupView.as_view()),
     url(r'^accounts/', include('allauth.urls')),
+    url(r'^admin/', include("massadmin.urls")),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('asset/', include('assets.urls', namespace='asset'),  ),
     path('user/', include('users.urls', namespace='user'),  ),
-    path('', TemplateView.as_view(template_name='index.html'))
+    path('', AssetListView.as_view())
+    #path('', TemplateView.as_view(template_name='index.html'))
 ]
 
 

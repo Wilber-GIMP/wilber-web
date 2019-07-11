@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-        <h1>NEW ASSET</h1>
-        
+{%if object.pk %} <h1>EDIT ASSET</h1>{%else%}<h1>NEW ASSET</h1>{%endif%}
+
+
         <form action="" enctype="multipart/form-data" method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" value="Submit">
       </form>
+
+      <a href="{{object.delete_url}}"><h1>Delete</h1></a>
 {% endblock content %}

@@ -12,6 +12,11 @@ from django.db.models import signals
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
+from autoslug import AutoSlugField
+
+
+
+
 User = settings.AUTH_USER_MODEL
 
 
@@ -37,10 +42,15 @@ class Asset(models.Model):
 
     owner = models.ForeignKey(User, related_name='assets', on_delete=models.CASCADE)
     category = models.CharField(max_length=9, choices=CATEGORIES)
-    #type = models.ForeignKey('AssetType', on_delete=models.CASCADE, null=True)
+
+
 
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=1000)
+
+    slug = AutoSlugField(null=True, default=None, unique=True, populate_from='name')
+
+    description = models.TextField(max_length=1000)
+    source = models.URLField(null=True, blank=True)
 
     file = models.FileField(upload_to = get_file_path, null=True, blank=True)
     filesize = models.IntegerField(default=0)
@@ -59,7 +69,17 @@ class Asset(models.Model):
         return self.category
 
     def get_absolute_url(self):
-        return reverse('asset:detail', kwargs={'pk': self.pk})
+        #return reverse('asset:detail', kwargs={'pk': self.pk})
+        return reverse('asset:detail-slug', kwargs={'slug': self.slug})
+
+    def edit_url(self):
+        #return reverse('asset:edit', kwargs={'pk': self.pk})
+        return reverse('asset:edit-slug', kwargs={'slug': self.slug})
+
+    def delete_url(self):
+        #return reverse('asset:delete', kwargs={'pk': self.pk})
+        return reverse('asset:delete-slug', kwargs={'slug': self.slug})
+
 
     def get_filesize(self):
         if self.file:

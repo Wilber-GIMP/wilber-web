@@ -49,8 +49,15 @@ THIRD_PARTY_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    #'allauth.socialaccount.providers.google',
+    #'allauth.socialaccount.providers.facebook',
     #'allauth.socialaccount.providers.openid',
+    'massadmin'
+
+
 ]
+
+SITE_ID = 1
 
 if DEBUG == True:
     THIRD_PARTY_APPS += [

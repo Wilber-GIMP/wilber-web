@@ -30,12 +30,12 @@
                     <span>{{ object.num_shares }}</span>
                 </div>
             </div>
-
-            {% if object.file %}
-            <h1><a href={{ object.file.url }}>DOWNLOAD</a></h1>
-            {% endif %}
-
-            {% if object.owner == request.user %}<a href={{object.edit_url}}><h2>Edit</h2></a>{%endif%}
+            <form method="POST" action="" class="form">
+            {% csrf_token %}
+            Are you sure you want to delete this asset?
+            <input type="submit" value="Yes"/>
+            <a href="{{object.get_absolute_url}}/">Cancel </a>
+            </form>
 
         </section>
 {% endblock content %}

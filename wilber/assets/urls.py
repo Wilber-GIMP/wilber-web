@@ -21,10 +21,24 @@ from .views import *
 app_name = 'asset'
 
 urlpatterns = [
-    path('add', view=AssetCreate.as_view(), name='add'),
     path('',  view=AssetListView.as_view(), name='list'),
-    path('<int:pk>',  view=AssetDetailView.as_view(), name='detail'),
-    path('<str:type>',  view=AssetFilteredListView.as_view(), name='type'),
+
+    path('new', view=AssetCreate.as_view(), name='add'),
+
+    #path('<int:pk>',  view=AssetDetailView.as_view(), name='detail'),
+
+
+
+    path('view/<int:pk>', AssetDetailView.as_view(), name='detail'),
+    path('view/<str:slug>', AssetDetailView.as_view(), name='detail-slug'),
+
+    path('edit/<int:pk>', AssetUpdateView.as_view(), name='edit'),
+    path('edit/<str:slug>', AssetUpdateView.as_view(), name='edit-slug'),
+
+    path('delete/<int:pk>', AssetDeleteView.as_view(), name='delete'),
+    path('delete/<str:slug>', AssetDeleteView.as_view(), name='delete-slug'),
+
+    path('<str:category>',  view=AssetFilteredListView.as_view(), name='type'),
     ]
 
 
