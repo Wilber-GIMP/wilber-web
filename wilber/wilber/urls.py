@@ -35,8 +35,17 @@ router.register(r'asset', AssetViewSet)
 router.register(r'user', UserViewSet)
 router.register(r'profile', UserProfileViewSet)
 
+react_view = TemplateView.as_view(template_name='index.html')
+
+
+urlpatterns = []
+
+
+
+
 urlpatterns = [
     url(r'api/', include(router.urls)),
+
     #path('api-auth/', include('rest_framework.urls')),
     url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
@@ -45,13 +54,12 @@ urlpatterns = [
     url(r'^admin/', include("massadmin.urls")),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('asset/', include('assets.urls', namespace='asset'),  ),
+    #path('asset/', include('assets.urls', namespace='asset'),  ),
     path('user/', include('users.urls', namespace='user'),  ),
-    path('', AssetListView.as_view())
-    #path('', TemplateView.as_view(template_name='index.html'))
+    #path('django/', AssetListView.as_view()),
+    #path('', AssetListView.as_view()),
+    path('', react_view),
 ]
-
-
 
 
 if settings.DEBUG:
@@ -64,3 +72,8 @@ if settings.DEBUG:
     urlpatterns = [
         path('__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
+
+
+urlpatterns += [
+    url(r'^(?:.*)/?$', react_view),
+]
