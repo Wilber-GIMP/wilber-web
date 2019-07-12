@@ -11,10 +11,11 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+from os.path import dirname, abspath
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+BASE_DIR = dirname(dirname(dirname(abspath(__file__))))
+print("BASE: ",BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -25,7 +26,7 @@ SECRET_KEY = '2e3f#bpw&w7p^51h^2x53i411@53gtx9%^obvf82(md*@qt%6b'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '104.248.232.184']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '104.248.232.184', 'wilber.social']
 INTERNAL_IPS = ['127.0.0.1', 'localhost']
 
 
@@ -59,12 +60,6 @@ THIRD_PARTY_APPS = [
 
 SITE_ID = 1
 
-if DEBUG == True:
-    THIRD_PARTY_APPS += [
-        'debug_toolbar',
-        'django_extensions',
-    ]
-
 
 LOCAL_APPS = [
     'assets.apps.AssetsConfig',
@@ -91,12 +86,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-if DEBUG == True:
-    MIDDLEWARE += [
-        'debug_toolbar.middleware.DebugToolbarMiddleware',
-    ]
 
-ROOT_URLCONF = 'wilber.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -114,7 +105,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'wilber.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
