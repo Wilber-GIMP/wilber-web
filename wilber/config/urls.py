@@ -55,7 +55,7 @@ urlpatterns = [
     url(r'^admin/', include("massadmin.urls")),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    #path('asset/', include('assets.urls', namespace='asset'),  ),
+    path('asset-django/', include('assets.urls', namespace='asset'),  ),
     path('user/', include('users.urls', namespace='user'),  ),
     path('django/', AssetListView.as_view()),
     #path('', AssetListView.as_view()),
