@@ -22,7 +22,7 @@ from django.contrib.auth import views as auth_views
 
 from django.views.generic import TemplateView
 from rest_framework import routers
-
+from rest_framework.authtoken import views
 
 from users.views import SignupView
 from assets.views import *
@@ -47,6 +47,7 @@ urlpatterns = [
     url(r'api/', include(router.urls)),
 
     #path('api-auth/', include('rest_framework.urls')),
+    url(r'^api-token-auth/', views.obtain_auth_token),
     url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
     url(r'^accounts/signup', SignupView.as_view()),
@@ -54,9 +55,9 @@ urlpatterns = [
     url(r'^admin/', include("massadmin.urls")),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    #path('asset/', include('assets.urls', namespace='asset'),  ),
+    path('asset-django/', include('assets.urls', namespace='asset'),  ),
     path('user/', include('users.urls', namespace='user'),  ),
-    #path('django/', AssetListView.as_view()),
+    path('django/', AssetListView.as_view()),
     #path('', AssetListView.as_view()),
     path('', react_view),
 ]

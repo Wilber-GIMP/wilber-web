@@ -11,5 +11,6 @@ Markdown==3.0.1
 Pillow==5.4.1
 pytz==2018.5
 
+django-request==1.5.4
 django-mass-edit==3.2.0
 
