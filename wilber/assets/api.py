@@ -144,7 +144,7 @@ class AssetListSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'url', 'username', 'category', 'name', 'image', 'file', 'folder', 'num_likes', 'is_liked' ]
 
 
-class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet ):
+class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
     #permission_classes = (IsAuthenticated,)
     queryset = Asset.objects.all()
     serializer_class = AssetSerializer
@@ -158,8 +158,7 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet ):
 
     def get_queryset(self):
         """
-        Optionally restricts the returned purchases to a given user,
-        by filtering against a `username` query parameter in the URL.
+        Restrict the donwloads to a single asset category
         """
         queryset = Asset.objects.all()
         category = self.request.query_params.get('category', None)
