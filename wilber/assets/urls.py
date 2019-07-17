@@ -27,8 +27,6 @@ urlpatterns = [
 
     #path('<int:pk>',  view=AssetDetailView.as_view(), name='detail'),
 
-
-
     path('view/<int:pk>', AssetDetailView.as_view(), name='detail'),
     path('view/<str:slug>', AssetDetailView.as_view(), name='detail-slug'),
 
