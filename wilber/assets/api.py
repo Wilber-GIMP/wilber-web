@@ -162,9 +162,9 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet ):
         by filtering against a `username` query parameter in the URL.
         """
         queryset = Asset.objects.all()
-        type = self.request.query_params.get('type', None)
-        if type is not None:
-            queryset = queryset.filter(type=type)
+        category = self.request.query_params.get('category', None)
+        if category is not None:
+            queryset = queryset.filter(category=category)
         return queryset
 
     @action(detail=True, methods=['get',], permission_classes=[IsAuthenticated], url_name='like')
