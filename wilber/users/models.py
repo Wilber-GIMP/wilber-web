@@ -60,6 +60,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     first_name = models.CharField(_('first name'), max_length=127)
     last_name = models.CharField(_('last name'), max_length=127)
+    name = models.CharField(_('full name'), max_length=255, null=True, blank=True)
     email = models.EmailField(_('email address'), max_length=255, blank=True)
     is_staff = models.BooleanField(_('staff status'), default=False, help_text=_('Designates whether the user can log into this admin site.'))
     is_active = models.BooleanField(_('active'), default=True, help_text=_('Designates whether this user should be treated as active. Unselect this instead of deleting accounts.'))
@@ -84,11 +85,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.first_name
 
-    def name(self):
+    def get_name(self):
         return self.get_full_name()
 
     def email_user(self, subject, message, from_email=None):
         send_mail(subject, message, from_email, [self.email])
+
+    def save(self, *args, **kwargs):
+        self.name = ' '.join([self.first_name, self.last_name])
+        super().save(*args, **kwargs)
 
 
 

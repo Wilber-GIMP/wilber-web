@@ -4,6 +4,9 @@ from rest_framework.fields import CurrentUserDefault
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from rest_framework.filters import SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend
+
 from .models import *
 from users.models import User, UserProfile
 
@@ -128,6 +131,7 @@ class AssetListSerializer(serializers.HyperlinkedModelSerializer):
 
     folder = serializers.ReadOnlyField()
     username = serializers.CharField(source='owner', read_only=True)
+    search_fields = ['name', 'description']
 
     is_liked = serializers.SerializerMethodField('_is_liked')
 
@@ -149,6 +153,9 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
     queryset = Asset.objects.all()
     serializer_class = AssetSerializer
 
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filterset_fields = ['name', 'description', 'owner__username', 'owner__name']
+    search_fields = ['name', 'description', 'owner__username', 'owner__name']
     serializer_action_classes = {
         'list': AssetListSerializer,
     }
@@ -156,7 +163,7 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-    def get_queryset(self):
+    def get_queryset2(self):
         """
         Restrict the donwloads to a single asset category
         """
@@ -164,6 +171,9 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
         category = self.request.query_params.get('category', None)
         if category is not None:
             queryset = queryset.filter(category=category)
+        search = self.request.query_params.get('search', None)
+        print(search)
+        print('YESSS')
         return queryset
 
     @action(detail=True, methods=['get',], permission_classes=[IsAuthenticated], url_name='like')

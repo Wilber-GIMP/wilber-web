@@ -14,7 +14,11 @@ class ProfileInline(admin.StackedInline):
     readonly_fields = ( 'birthday',)
 
 class CustomUserAdmin(UserAdmin):
-    inlines = (ProfileInline, )
+    #inlines = (ProfileInline, )
+
+    fieldsets = UserAdmin.fieldsets + (
+            (None, {'fields': ('name',)}),
+    )
 
     def get_inline_instances(self, request, obj=None):
         if not obj:
@@ -24,11 +28,11 @@ class CustomUserAdmin(UserAdmin):
 
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'name', 'email', )
-    
+
     readonly_fields = ( 'email',)
-    
+
     #fields = ('user', 'name', 'email')
-    
+
     def email(self, obj):
         return obj.user.email
     def name(self, obj):
