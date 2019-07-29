@@ -18,16 +18,20 @@ def get_user():
     return u
 
 
-def create_asset(name, description, image_path, asset_file_path, url):
+def create_asset(name, description, category, image_path, asset_file_path, url):
 
 
     u = get_user()
 
     asset, created = Asset.objects.get_or_create(
         name=name,
-        defaults={'source': url, 'description':description, 'owner':u},
+        defaults={'source': url, 'description':description, 'owner':u, 'category':category},
     )
 
+    asset.source = url
+    asset.description = description
+    asset.owner = u
+    asset.category = category
 
     asset_file = open(asset_file_path, 'rb')
     asset.file.save(os.path.basename(asset_file_path), File(asset_file))
@@ -52,7 +56,7 @@ def parse_asset(asset, category):
     except:
         print('ERROR',files)
     else:
-        create_asset(name, description, image, asset_file, url)
+        create_asset(name, description, category, image, asset_file, url)
 
 
 

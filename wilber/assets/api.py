@@ -154,7 +154,7 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
     serializer_class = AssetSerializer
 
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filterset_fields = ['name', 'description', 'owner__username', 'owner__name']
+    filterset_fields = ['name', 'category', 'description', 'owner__username', 'owner__name']
     search_fields = ['name', 'description', 'owner__username', 'owner__name']
     serializer_action_classes = {
         'list': AssetListSerializer,

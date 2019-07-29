@@ -3,7 +3,7 @@ import os
 from django.db import models
 from django.conf import settings
 from django.core.files.storage import default_storage
-
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -14,7 +14,7 @@ from django.dispatch import receiver
 
 from autoslug import AutoSlugField
 
-
+from .validators import FileValidator
 
 
 User = settings.AUTH_USER_MODEL
@@ -28,14 +28,12 @@ def get_file_path(instance, filename):
 
 
 
-
-
-
 class Asset(models.Model):
     CATEGORIES = [
         ('brushes', 'Brush'),
         ('patterns', 'Pattern'),
         ('gradients', 'Gradient'),
+        ('palettes', 'Palette'),
         ('plug-ins', 'Plug-in'),
     ]
 
@@ -49,13 +47,21 @@ class Asset(models.Model):
 
     slug = AutoSlugField(null=True, default=None, unique=True, populate_from='name')
 
-    description = models.TextField(max_length=1000)
+    description = models.TextField(max_length=3000)
     source = models.URLField(null=True, blank=True)
 
-    file = models.FileField(upload_to = get_file_path, null=True, blank=True)
+    file = models.FileField(upload_to = get_file_path,
+        null=True, blank=True,
+        validators=[FileValidator(max_size=10*2**20)]
+        )
+
     filesize = models.IntegerField(default=0)
 
-    image = models.ImageField(upload_to = get_image_path, default = 'images/none/no-img.jpg', null=True, blank=True)
+    image = models.ImageField(upload_to = get_image_path,
+        default = 'images/none/no-img.jpg',
+        null=True, blank=True,
+        validators=[FileValidator(max_size=10*2**20)])
+
     likes = models.ManyToManyField(User, through='Like', related_name='liked')
 
     num_likes = models.PositiveIntegerField(default=0)
