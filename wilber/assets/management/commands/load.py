@@ -4,6 +4,7 @@ import os
 from assets.models import Asset
 from users.models import User
 from django.core.files import File
+from django.db import transaction
 
 
 def listfolders(path):
@@ -11,27 +12,27 @@ def listfolders(path):
 
 
 def get_user():
-    u = User.objects.get(username='deviantart')
-    if u:
-        return u
-    u = User.objects.create_user('deviantart', 'deviantart@wilber.social', 'deviant-art')
+    try:
+        u = User.objects.get(username='deviantart')
+    except User.DoesNotExist:
+
+        u = User.objects.create_user('deviantart', 'deviantart@wilber.social', 'deviant-art')
     return u
 
-
+@transaction.atomic
 def create_asset(name, description, category, image_path, asset_file_path, url):
-
-
     u = get_user()
 
     asset, created = Asset.objects.get_or_create(
-        name=name,
-        defaults={'source': url, 'description':description, 'owner':u, 'category':category},
+        name=name, defaults={'source': url, 'description':description, 'owner':u, 'category':category},
     )
 
     asset.source = url
     asset.description = description
     asset.owner = u
     asset.category = category
+
+    asset.save()
 
     asset_file = open(asset_file_path, 'rb')
     asset.file.save(os.path.basename(asset_file_path), File(asset_file))
@@ -41,6 +42,7 @@ def create_asset(name, description, category, image_path, asset_file_path, url):
 
 
     asset.save()
+
 
 
 def parse_asset(asset, category):

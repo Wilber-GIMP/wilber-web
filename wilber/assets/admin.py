@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.utils.html import format_html
-
+from django.utils.safestring import mark_safe
 from django.db.transaction import atomic
-# Register your models here.
+
 from .models import *
 
 from .admin_utils import field
@@ -31,10 +31,15 @@ class AssetAdmin(admin.ModelAdmin):
     def get_filesize(self, obj):
         return sizeof_fmt(obj.filesize)
 
+    def image_tag(self, obj):
+        return mark_safe('<img src="/media/%s"  height="300" />' % (obj.image))
+
+    image_tag.short_description = 'Image'
+
     readonly_fields = ('image_tag',)
     list_display = ['name', 'category', 'owner', 'get_filesize', 'num_likes', 'image', 'slug']
     search_fields = ['name']
-    #list_filter = ['type',]
+    list_filter = ['category',]
     actions = [recalculate_likes]
 
 

@@ -5,11 +5,11 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from django.utils.safestring import mark_safe
+
 
 
 from django.db.models import signals
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save, pre_delete, post_delete
 from django.dispatch import receiver
 
 from autoslug import AutoSlugField
@@ -17,17 +17,20 @@ from imagekit.models import ProcessedImageField
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFit
 
-from .validators import FileValidator
+from .validators import FileValidator, PathAndRename
 
+
+from IPython import embed
 
 User = settings.AUTH_USER_MODEL
 
 
 def get_image_path(instance, filename):
-    return os.path.join('images', str(instance.folder()), filename)
+    return PathAndRename('images')(instance, filename)
 
 def get_file_path(instance, filename):
-    return os.path.join('assets', str(instance.folder()), filename)
+    return PathAndRename('assets')(instance, filename)
+
 
 
 
@@ -39,7 +42,6 @@ class Asset(models.Model):
         ('palettes', 'Palette'),
         ('plug-ins', 'Plug-in'),
     ]
-
 
     owner = models.ForeignKey(User, related_name='assets', on_delete=models.CASCADE)
     category = models.CharField(max_length=9, choices=CATEGORIES)
@@ -58,16 +60,11 @@ class Asset(models.Model):
         validators=[FileValidator(max_size=10*2**20)]
         )
 
-    filesize = models.IntegerField(default=0)
-
-    #image = models.ImageField(upload_to = get_image_path,
-    #    default = 'images/none/no-img.jpg',
-    #    null=True, blank=True,
-    #    validators=[FileValidator(max_size=10*2**20)])
+    filesize = models.IntegerField(default=0, editable=False)
 
 
     image = ProcessedImageField(upload_to = get_image_path,
-                                           default = 'images/none/no-img.jpg',
+                                           default = 'images/no-img.png',
                                            null=True, blank=True,
                                            validators=[FileValidator(max_size=10*2**20)],
                                            processors=[ResizeToFit(2048, 2048)],
@@ -81,9 +78,9 @@ class Asset(models.Model):
 
     likes = models.ManyToManyField(User, through='Like', related_name='liked')
 
-    num_likes = models.PositiveIntegerField(default=0)
-    num_downloads = models.PositiveIntegerField(default=0)
-    num_shares = models.PositiveIntegerField(default=0)
+    num_likes = models.PositiveIntegerField(default=0,  editable=False)
+    num_downloads = models.PositiveIntegerField(default=0,  editable=False)
+    num_shares = models.PositiveIntegerField(default=0,  editable=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -105,17 +102,14 @@ class Asset(models.Model):
 
 
     def get_filesize(self):
-        if self.file:
+        if self.file and os.path.exists(self.file.path):
             return default_storage.size(self.file.path)
         return 0
 
     def __str__(self):
         return self.name
 
-    def image_tag(self):
-        return mark_safe('<img src="/media/%s" width="150" height="150" />' % (self.image))
 
-    image_tag.short_description = 'Image'
 
     def calculate_likes(self):
         return self.likes.all().count()
@@ -142,6 +136,30 @@ class Asset(models.Model):
         except Like.DoesNotExist:
             return False
 
+    def rename_files(self, file_field, get_path):
+        if file_field:
+            if 'no-img.png' in os.path.basename(file_field.name):
+                return
+            # Create new filename, using primary key and file extension
+            old_filename = file_field.name
+            new_filename = get_path(self, old_filename)
+            # Create new file and remove old one
+            if new_filename != old_filename:
+                file_field.storage.delete( new_filename )
+                file_field.storage.save( new_filename, file_field )
+                file_field.name = new_filename
+                file_field.close()
+                file_field.storage.delete(old_filename)
+
+    def save( self, *args, **kwargs ):
+        if self.pk:
+            super(Asset, self ).save( *args, **kwargs)
+        else:
+            super(Asset, self ).save( *args, **kwargs)
+            self.rename_files(self.file, get_file_path)
+            self.rename_files(self.image, get_image_path)
+            super(Asset, self ).save( *args, **kwargs)
+
 class Like(models.Model):
     user = models.ForeignKey(User, related_name='likes', on_delete=models.CASCADE)
     asset = models.ForeignKey(Asset, related_name='liked', on_delete=models.CASCADE)
@@ -166,6 +184,26 @@ def update_filesize(sender, **kwargs):
 
 
 
+def recursive_delete_path(path):
+    try:
+        os.rmdir(path)
+    except:
+        pass
+    else:
+        recursive_delete_path(os.path.dirname(path))
+
+@receiver(post_delete, sender=Asset)
+def submission_delete(sender, instance, **kwargs):
+    filepath = instance.file.path
+    instance.file.delete(False)
+    recursive_delete_path(os.path.dirname(filepath))
+
+    imagepath = instance.image.path
+    instance.image.delete(False)
+    recursive_delete_path(os.path.dirname(imagepath))
+
+
+
 @receiver(post_save, sender=Like)
 def do_like(sender, instance, created, **kwargs):
     if created:
@@ -176,3 +214,6 @@ def do_like(sender, instance, created, **kwargs):
 def unlike(sender, instance, **kwargs):
     instance.asset.num_likes -= 1
     instance.asset.save()
+
+
+

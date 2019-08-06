@@ -8,13 +8,15 @@
 # @author jrosebr1
 
 import mimetypes
+import os
+import time
 from os.path import splitext
-
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import filesizeformat
 from django.utils.deconstruct import deconstructible
-
+from uuid import uuid4
 
 @deconstructible
 class FileValidator(object):
@@ -91,3 +93,41 @@ class FileValidator(object):
             }
 
             raise ValidationError(message)
+
+
+
+@deconstructible
+class PathAndRename(object):
+    def __init__(self, sub_path):
+        self.basepath = sub_path
+
+    def check_if_exists(self, instance, filename):
+        name = self.get_full_path(instance, filename)
+        fulpath = os.path.join(settings.MEDIA_ROOT, name)
+
+        if os.path.exists(fulpath):
+            os.remove(fulpath)
+
+    def get_path(self, instance, filename):
+        timed_path = time.strftime('%Y/%m/%d')
+        if instance.pk:
+            return os.path.join(timed_path, instance.category, '{:0>6d}__{}'.format(instance.pk, instance.slug))
+        else:
+            return os.path.join(timed_path, instance.category)
+
+    def get_filename(self, instance, filename):
+        base_filename, file_ext = os.path.splitext(filename)
+        if instance.pk:
+            return '{:0>6d}__{}_{}{}'.format(instance.pk, instance.category, instance.slug, file_ext)
+        else:
+            return '{}_{}_{}{}'.format(instance.category, uuid4().hex[:6], instance.slug, file_ext)
+
+    def get_full_path(self, instance, filename):
+        path = self.get_path(instance, filename)
+        new_filename = self.get_filename(instance, filename)
+        return os.path.join(self.basepath, path, new_filename)
+
+
+    def __call__(self, instance, filename):
+        self.check_if_exists(instance, filename)
+        return self.get_full_path(instance, filename)
