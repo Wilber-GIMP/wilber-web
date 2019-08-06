@@ -20,8 +20,6 @@ from imagekit.processors import ResizeToFit
 from .validators import FileValidator, PathAndRename
 
 
-from IPython import embed
-
 User = settings.AUTH_USER_MODEL
 
 
