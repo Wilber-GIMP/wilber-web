@@ -132,7 +132,7 @@ class AssetListSerializer(serializers.HyperlinkedModelSerializer):
     folder = serializers.ReadOnlyField()
     username = serializers.CharField(source='owner', read_only=True)
     search_fields = ['name', 'description']
-
+    image_thumbnail = serializers.ImageField(read_only=True)
     is_liked = serializers.SerializerMethodField('_is_liked')
 
     def _is_liked(self, obj):
@@ -145,7 +145,7 @@ class AssetListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Asset
 
-        fields = ['id', 'url', 'username', 'category', 'name', 'image', 'file', 'folder', 'num_likes', 'is_liked' ]
+        fields = ['id', 'url', 'username', 'category', 'name', 'image', 'image_thumbnail',  'file', 'folder', 'num_likes', 'is_liked' ]
 
 
 class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):

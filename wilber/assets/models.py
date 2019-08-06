@@ -13,6 +13,9 @@ from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
 from autoslug import AutoSlugField
+from imagekit.models import ProcessedImageField
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFit
 
 from .validators import FileValidator
 
@@ -57,10 +60,24 @@ class Asset(models.Model):
 
     filesize = models.IntegerField(default=0)
 
-    image = models.ImageField(upload_to = get_image_path,
-        default = 'images/none/no-img.jpg',
-        null=True, blank=True,
-        validators=[FileValidator(max_size=10*2**20)])
+    #image = models.ImageField(upload_to = get_image_path,
+    #    default = 'images/none/no-img.jpg',
+    #    null=True, blank=True,
+    #    validators=[FileValidator(max_size=10*2**20)])
+
+
+    image = ProcessedImageField(upload_to = get_image_path,
+                                           default = 'images/none/no-img.jpg',
+                                           null=True, blank=True,
+                                           validators=[FileValidator(max_size=10*2**20)],
+                                           processors=[ResizeToFit(2048, 2048)],
+                                           format='JPEG',
+                                           options={'quality': 80})
+
+    image_thumbnail = ImageSpecField(source='image',
+                                      processors=[ResizeToFit(300, 300)],
+                                      format='JPEG',
+                                      options={'quality': 60})
 
     likes = models.ManyToManyField(User, through='Like', related_name='liked')
 

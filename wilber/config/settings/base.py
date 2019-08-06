@@ -53,7 +53,8 @@ THIRD_PARTY_APPS = [
     #'allauth.socialaccount.providers.google',
     #'allauth.socialaccount.providers.facebook',
     #'allauth.socialaccount.providers.openid',
-    'massadmin'
+    'massadmin',
+    'imagekit',
 ]
 
 SITE_ID = 1
