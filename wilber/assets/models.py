@@ -158,8 +158,6 @@ class Like(models.Model):
 def update_filesize(asset):
     asset.filesize = asset.get_filesize()
 
-from IPython import embed
-
 def rename_file(asset, file_field, get_path):
     if file_field:
         if 'no-img.png' in os.path.basename(file_field.name):
