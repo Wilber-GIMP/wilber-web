@@ -45,8 +45,6 @@ EMAIL_PORT = 1025
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#prerequisites
 INSTALLED_APPS += [
     "debug_toolbar",
-    'django_extensions', # https://django-extensions.readthedocs.io/en/latest/installation_instructions.html#configuration
-    'request',
     ]  # noqa F405
 
 

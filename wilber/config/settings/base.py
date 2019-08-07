@@ -42,6 +42,7 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    'django_extensions', # https://django-extensions.readthedocs.io/en/latest/installation_instructions.html#configuration
     'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
@@ -55,6 +56,8 @@ THIRD_PARTY_APPS = [
     #'allauth.socialaccount.providers.openid',
     'massadmin',
     'imagekit',
+    'request',
+
 ]
 
 SITE_ID = 1
