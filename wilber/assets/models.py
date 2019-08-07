@@ -53,7 +53,7 @@ class Asset(models.Model):
     description = models.TextField(max_length=3000)
     source = models.URLField(null=True, blank=True)
 
-    file = models.FileField(upload_to = get_file_path,
+    file = models.FileField(max_length=255, upload_to = get_file_path,
         null=True, blank=True,
         validators=[FileValidator(max_size=10*2**20)]
         )
@@ -61,7 +61,7 @@ class Asset(models.Model):
     filesize = models.IntegerField(default=0, editable=False)
 
 
-    image = ProcessedImageField(upload_to = get_image_path,
+    image = ProcessedImageField(max_length=255, upload_to = get_image_path,
                                            default = 'images/no-img.png',
                                            null=True, blank=True,
                                            validators=[FileValidator(max_size=10*2**20)],
