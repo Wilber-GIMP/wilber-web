@@ -32,7 +32,7 @@ def create_asset(name, description, category, image_path, asset_file_path, url):
     asset.owner = u
     asset.category = category
 
-    asset.save()
+    #asset.save()
 
     asset_file = open(asset_file_path, 'rb')
     asset.file.save(os.path.basename(asset_file_path), File(asset_file))
@@ -69,6 +69,7 @@ def parse_category(folder):
     assets = listfolders(folder)
     for asset in assets:
         parse_asset(asset, category)
+
 
 
 def parse_folders(path):

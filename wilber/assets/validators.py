@@ -98,8 +98,9 @@ class FileValidator(object):
 
 @deconstructible
 class PathAndRename(object):
-    def __init__(self, sub_path):
+    def __init__(self, sub_path, remove=True):
         self.basepath = sub_path
+        self.remove = remove
 
     def check_if_exists(self, instance, filename):
         name = self.get_full_path(instance, filename)
@@ -129,5 +130,6 @@ class PathAndRename(object):
 
 
     def __call__(self, instance, filename):
-        self.check_if_exists(instance, filename)
+        if self.remove:
+            self.check_if_exists(instance, filename)
         return self.get_full_path(instance, filename)

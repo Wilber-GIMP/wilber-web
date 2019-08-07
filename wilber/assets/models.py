@@ -23,11 +23,11 @@ from .validators import FileValidator, PathAndRename
 User = settings.AUTH_USER_MODEL
 
 
-def get_image_path(instance, filename):
-    return PathAndRename('images')(instance, filename)
+def get_image_path(instance, filename, remove=True):
+    return PathAndRename('images', remove)(instance, filename)
 
-def get_file_path(instance, filename):
-    return PathAndRename('assets')(instance, filename)
+def get_file_path(instance, filename, remove=True):
+    return PathAndRename('assets', remove)(instance, filename)
 
 
 
@@ -134,29 +134,7 @@ class Asset(models.Model):
         except Like.DoesNotExist:
             return False
 
-    def rename_files(self, file_field, get_path):
-        if file_field:
-            if 'no-img.png' in os.path.basename(file_field.name):
-                return
-            # Create new filename, using primary key and file extension
-            old_filename = file_field.name
-            new_filename = get_path(self, old_filename)
-            # Create new file and remove old one
-            if new_filename != old_filename:
-                file_field.storage.delete( new_filename )
-                file_field.storage.save( new_filename, file_field )
-                file_field.name = new_filename
-                file_field.close()
-                file_field.storage.delete(old_filename)
 
-    def save( self, *args, **kwargs ):
-        if self.pk:
-            super(Asset, self ).save( *args, **kwargs)
-        else:
-            super(Asset, self ).save( *args, **kwargs)
-            self.rename_files(self.file, get_file_path)
-            self.rename_files(self.image, get_image_path)
-            super(Asset, self ).save( *args, **kwargs)
 
 class Like(models.Model):
     user = models.ForeignKey(User, related_name='likes', on_delete=models.CASCADE)
@@ -171,14 +149,55 @@ class Like(models.Model):
 
 
 
-@receiver(post_save, sender=Asset)
-def update_filesize(sender, **kwargs):
-    asset = kwargs["instance"]
+
+
+
+
+
+
+def update_filesize(asset):
     asset.filesize = asset.get_filesize()
 
-    signals.post_save.disconnect(update_filesize, sender=Asset)
+from IPython import embed
+
+def rename_file(asset, file_field, get_path):
+    if file_field:
+        if 'no-img.png' in os.path.basename(file_field.name):
+            return
+        # Create new filename, using primary key and file extension
+        old_filename = file_field.name
+        new_filename = get_path(asset, old_filename, False)
+        # Create new file and remove old one
+        if new_filename != old_filename:
+            file_field.storage.delete( new_filename )
+            file_field.storage.save( new_filename, file_field )
+            file_field.name = new_filename
+            file_field.close()
+            file_field.storage.delete(old_filename)
+
+
+
+
+#@receiver(post_save, sender=Asset)
+def rename_files(asset):
+    rename_file(asset, asset.file, get_file_path)
+    rename_file(asset, asset.image, get_image_path)
+
+
+
+
+@receiver(post_save, sender=Asset)
+def post_save_asset(sender, **kwargs):
+
+    signals.post_save.disconnect(post_save_asset, sender=Asset)
+    asset = kwargs["instance"]
+
+    rename_files(asset)
     asset.save()
-    signals.post_save.connect(update_filesize, sender=Asset)
+    update_filesize(asset)
+    asset.save()
+    signals.post_save.connect(post_save_asset, sender=Asset)
+
 
 
 
@@ -192,13 +211,15 @@ def recursive_delete_path(path):
 
 @receiver(post_delete, sender=Asset)
 def submission_delete(sender, instance, **kwargs):
-    filepath = instance.file.path
-    instance.file.delete(False)
-    recursive_delete_path(os.path.dirname(filepath))
-
-    imagepath = instance.image.path
-    instance.image.delete(False)
-    recursive_delete_path(os.path.dirname(imagepath))
+    if instance.file:
+        filepath = instance.file.path
+        instance.file.delete(False)
+        recursive_delete_path(os.path.dirname(filepath))
+    if instance.image:
+        imagepath = instance.image.path
+        if 'no-img.png' not in imagepath:
+            instance.image.delete(False)
+            recursive_delete_path(os.path.dirname(imagepath))
 
 
 
