@@ -1,10 +1,17 @@
 from .base import *  # noqa
 #from .base import env
-
+from .secrets import *
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = True
+
+
+
+sentry_sdk.init(
+    dsn=SENTRY_DSN,
+    integrations=[DjangoIntegration()]
+)
 
 
 #SECRET_KEY = "Kk2I0vDBjJNKlr84BHi8iAHzkEpjfX2hEi5oq9Kmnt542ZH2pg9oPpblf5sbAkcx"

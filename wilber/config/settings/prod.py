@@ -4,6 +4,13 @@ from .secrets import *
 
 DEBUG = False
 
+
+sentry_sdk.init(
+    dsn=SENTRY_DSN,
+    integrations=[DjangoIntegration()]
+)
+
+
 SECRET_KEY = DJANGO_SECRET
 
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "wilber.social", ".wilber.social"]
