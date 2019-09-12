@@ -40,13 +40,15 @@ react_view = TemplateView.as_view(template_name='index.html')
 
 urlpatterns = []
 
-
+def trigger_error(request):
+    division_by_zero = 1 / 0
 
 
 urlpatterns = [
     url(r'api/', include(router.urls)),
 
     #path('api-auth/', include('rest_framework.urls')),
+    path('sentry-debug/', trigger_error),
     url(r'^api-token-auth/', views.obtain_auth_token),
     url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
