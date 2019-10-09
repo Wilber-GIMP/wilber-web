@@ -39,6 +39,7 @@ class MultiSerializerViewSetMixin(object):
 
 
 class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     class Meta:
         model = UserProfile
         fields = '__all__'
@@ -155,7 +156,8 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
 
     filter_backends = (SearchFilter, DjangoFilterBackend)
     filterset_fields = ['name', 'category', 'description', 'owner__username', 'owner__name']
-    search_fields = ['name', 'description', 'owner__username', 'owner__name']
+    search_fields = ['name', 'category', 'description', 'owner__username', 'owner__name']
+    #search_fields = ['name', 'owner__username']
     serializer_action_classes = {
         'list': AssetListSerializer,
     }
