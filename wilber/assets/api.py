@@ -38,15 +38,44 @@ class MultiSerializerViewSetMixin(object):
             return super(MultiSerializerViewSetMixin, self).get_serializer_class()
 
 
+
+
+class AssetListSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField()
+
+    folder = serializers.ReadOnlyField()
+    username = serializers.CharField(source='owner', read_only=True)
+    search_fields = ['name', 'description']
+    image_thumbnail = serializers.ImageField(read_only=True)
+    is_liked = serializers.SerializerMethodField('_is_liked')
+
+    def _is_liked(self, obj):
+        request = self.context.get('request')
+        if request:
+            return obj.is_liked(request._user)
+        return None
+
+
+    class Meta:
+        model = Asset
+
+        fields = ['id', 'url', 'username', 'category', 'name', 'image', 'image_thumbnail',  'file', 'folder', 'num_likes', 'is_liked' ]
+
+
+
+
 class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = UserProfile
         fields = '__all__'
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     profile = UserProfileSerializer(read_only=True)
-    assets = serializers.HyperlinkedRelatedField(many=True, view_name='asset-detail', read_only=True)
+    #assets = serializers.HyperlinkedRelatedField(many=True, view_name='asset-detail', read_only=True)
+    assets = AssetListSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
@@ -127,26 +156,6 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
-class AssetListSerializer(serializers.HyperlinkedModelSerializer):
-    id = serializers.ReadOnlyField()
-
-    folder = serializers.ReadOnlyField()
-    username = serializers.CharField(source='owner', read_only=True)
-    search_fields = ['name', 'description']
-    image_thumbnail = serializers.ImageField(read_only=True)
-    is_liked = serializers.SerializerMethodField('_is_liked')
-
-    def _is_liked(self, obj):
-        request = self.context.get('request')
-        if request:
-            return obj.is_liked(request._user)
-        return None
-
-
-    class Meta:
-        model = Asset
-
-        fields = ['id', 'url', 'username', 'category', 'name', 'image', 'image_thumbnail',  'file', 'folder', 'num_likes', 'is_liked' ]
 
 
 class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
