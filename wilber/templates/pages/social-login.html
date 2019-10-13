@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+{% block content %}
+
+
+
+{% providers_media_js %}
+<div class="grid">
+    <p>
+<a href="{% provider_login_url "facebook" method="js_sdk" %}">Facebook Connect</a>
+</p>
+<p>
+<a href="{% provider_login_url "google" method="js_sdk" %}">Google Connect</a>
+</p>
+</div>
+
+
+
+{% endblock content %}

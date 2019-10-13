@@ -55,6 +55,7 @@ urlpatterns = [
     url(r'^accounts/signup', SignupView.as_view()),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', include("massadmin.urls")),
+    path('social-login/', TemplateView.as_view(template_name='pages/social-login.html'), name='social-login'),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('asset-django/', include('assets.urls', namespace='asset'),  ),
