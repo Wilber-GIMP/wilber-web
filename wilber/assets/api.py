@@ -82,6 +82,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         exclude = ['password', 'user_permissions']
 
 class UserInlineSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     profile = UserProfileSerializer(read_only=True)
 
     class Meta:
