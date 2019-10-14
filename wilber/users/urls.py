@@ -21,8 +21,8 @@ from .views import *
 app_name = 'users'
 
 urlpatterns = [
-    path('profile',  view=UserMyProfileView.as_view(), name='profile'),
-    path('profile/edit',  view=UserEditView.as_view(), name='edit'),
+    path('myself',  view=UserMyProfileView.as_view(), name='myself'),
+    path('myself/edit',  view=UserEditView.as_view(), name='edit'),
     path('<str:username>',  view=UserDetailView.as_view(), name='detail'),
 ]
 

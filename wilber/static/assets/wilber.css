@@ -2,7 +2,13 @@
 purple: #b08cf9
 grey-light: #9c9c9c
 */
+
+* {
+color: #FFF;
+}
+
 body{
+
     background-color: #151412;
 }
 .head .types-menu{

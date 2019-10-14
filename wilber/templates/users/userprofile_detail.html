@@ -1,10 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-        <h1>USERNAME: {{profile.user.username}}</h1>
 
         {% if request.user == profile.user %}
+        <h1>My username: {{profile.user.username}}</h1>
+
         <h2><a href="{% url 'user:edit' %}">EDIT</a></h2>
+        <h3><a href="{% url 'account_logout' %}">Logout</a></h3>
+        {% else %}
+        <h1>Username: {{profile.user.username}}</h1>
+
         {% endif %}
 
         <p>Name: {{profile.user.get_full_name}}</p>
@@ -19,12 +24,15 @@
         <p>City: {{profile.city}}</p>
         <p>Country: {{profile.country}}</p>
 
-
+        {% if request.user == profile.user %}
         <h1>My Assets:</h1>
+        {% else %}
+        <h1>Assets:</h1>
+        {% endif %}
         <table class="table">
             <thead>
             <tr>
-                <th>Type</th>
+                <th>Category</th>
                 <th>Name</th>
                 <th>Size</th>
             </tr>
@@ -33,7 +41,7 @@
             <tbody>
                 {% for object in asset_list %}
                 <tr>
-                    <td>{{object.type}}</td>
+                    <td>{{object.category}}</td>
                     <td><a href="{{object.edit_url}}">{{object.name}}</a></td>
                     <td>{{object.filesize|filesizeformat}}</td>
                     <td><a href={{object.delete_url}}>delete</a> </td>
@@ -46,7 +54,7 @@
             </tbody>
         </table>
 
-        <h1>Quota</h1>
+
 
 
 {% endblock content %}
