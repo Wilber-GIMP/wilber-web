@@ -78,6 +78,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
+    def get_absolute_url(self):
+        return reverse('user:detail', kwargs={'username': self.username})
+
     def get_full_name(self):
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
@@ -100,7 +103,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
 
-    photo = models.ImageField(verbose_name=_("Profile Picture"), upload_to="profiles", default = 'profiles/none/no-img.jpg', max_length=255, null=True, blank=True)
+    photo = models.ImageField(verbose_name=_("Profile Picture"), upload_to="profiles", default = 'profiles/none/no-image-profile.png', max_length=255, null=True, blank=True)
 
     phone = models.CharField(max_length=20, blank=True, default='')
     bio = models.TextField(default='', blank=True)
