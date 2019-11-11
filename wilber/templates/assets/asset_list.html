@@ -1,38 +1,64 @@
 {% extends "base.html" %}
-{% load asset_tags %}
+
 
 {% block content %}
+<section class="section">
+    <div class="content">
 
-        <section class="grid">
-            <div class="row">
-            {% for item in asset_list %}
-                <div class="col-4">
-                    <a href="{{ item.get_absolute_url  }}">
-                        <figure>
-                            <img src="{{ item.image_thumbnail.url }}" />
-                            <figcaption>
-                                <h2>{{ item.name }}</h2>
-                                <p>{{ item.description }}</p>
-                                <button>View</button>
-                                <p></p>
-                            </figcaption>
-                        </figure>
-                    </a>
-                    <div class="item-atributes">
-                        {% asset_liked item request.user as is_liked %}
-                        {% if is_liked  %}
-                        <a href="#" onclick="do_unlike({{item.pk}});" ><i class="fas fa-heart"></i></a>
-                        {% else %}
-                        <a href="#" onclick="do_like({{item.pk}});" ><i class="far fa-heart"></i></a>
-                        {% endif %}
-                        <span>{{ item.num_likes }}</span>
-                        <i class="far fa-arrow-alt-circle-down"></i>
-                        <span>{{ item.num_downloads }}</span>
-                        <i class="fas fa-share-alt"></i>
-                        <span>{{ item.num_shares }}</span>
-                    </div>
+
+        <div class="tile is-ancestor">
+            <div class="tile is-parent">
+                {% for asset in asset_list %}
+                <div class="tile is-child is-3 ">
+                    {% include 'assets/asset_list_item.html' with asset=asset %}
                 </div>
-            {% endfor %}
+                {% if forloop.counter|divisibleby:"4" %}
             </div>
-        </section>
+        </div>
+        <div class="tile is-ancestor">
+            <div class="tile is-parent">
+                {% endif %}
+
+                {% endfor %}
+            </div>
+        </div>
+
+
+    </div>
+</section>
+{% if is_paginated %}
+<section class="section">
+    <div class="columns is-centered">
+        <div class="column is-one-quarter has-text-right">
+            {% if page_obj.has_previous %}
+                    <a class="button" href="{{url}}?page={{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+        </div>
+        <div class="column is-one-quarter has-text-left">
+            {% if page_obj.has_next %}
+                    <a class="button" href="{{url}}?page={{ page_obj.next_page_number }}">next</a>
+                {% endif %}
+        </div>
+    </div>
+    <div class="columns is-centered">
+        <div class="column is-one-quarter has-text-centered">
+            <span class="page-current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+        </div>
+    </div>
+
+
+
+</section>
+{% endif %}
+
+
+
+
+
+
+
+
+
 {% endblock content %}

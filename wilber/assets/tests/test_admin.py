@@ -4,7 +4,6 @@ from django.test import TestCase
 from django.test import RequestFactory
 from django.urls import reverse
 
-from django.contrib.admin.options import  ModelAdmin
 from django.core.files.base import ContentFile
 from django.core.files.base import File
 
@@ -12,7 +11,8 @@ from django.core.files.base import File
 from .models import Asset
 from .admin import AssetAdmin
 from users.models import User
-from pprint import pprint
+
+
 class MockSuperUser:
     def has_perm(self, perm):
         return True
@@ -40,8 +40,8 @@ class AssetAdminTest(TestCase):
                                  email='jlennon2@beatles.com',
                                  password=self.password)
                                  
-        self.asset = Asset.objects.create(name='Test Asset 1', owner=self.user)
-        self.asset2 = Asset.objects.create(name='Test Asset 2', owner=self.user)
+        self.asset = Asset.objects.create(name='Test Asset Admin 1', owner=self.user)
+        self.asset2 = Asset.objects.create(name='Test Asset Admin 2', owner=self.user)
         
         self.file = ContentFile(b'model_id\n1\n2\n'*1000)
 
@@ -68,15 +68,15 @@ class AssetAdminTest(TestCase):
         
     def test_filesize(self):
         asset = Asset.objects.get(id=1)
-        f = File(open('static/imgs/01.jpg', 'rb'))
+        f = File(open('test/package_file.zip', 'rb'))
         asset.file.save('test_filename', f)
         
-        self.assertEqual(asset.get_filesize(), 85718)
+        self.assertEqual(asset.get_filesize(), 566943)
         
         url = reverse('admin:assets_asset_changelist')
         self.client.login(username=self.username, password=self.password)
         resp = self.client.get(url, follow=True)
-        pprint(str(resp.content))
+        #pprint(str(resp.content))
         
     def test_file_upload(self):
         # each admin url consits of the following three things

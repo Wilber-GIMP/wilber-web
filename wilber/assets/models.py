@@ -1,13 +1,10 @@
 import os
-
+import logging
 from django.db import models
 from django.conf import settings
 from django.core.files.storage import default_storage
-from django.core.exceptions import ValidationError
+from django.core.files.base import File
 from django.urls import reverse
-
-
-
 from django.db.models import signals
 from django.db.models.signals import post_save, pre_delete, post_delete
 from django.dispatch import receiver
@@ -17,11 +14,14 @@ from imagekit.models import ProcessedImageField
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFit
 
-from .validators import FileValidator, PathAndRename
+from django_extensions.db.models import TimeStampedModel
 
+
+from .validators import FileValidator, PathAndRename
+from .wilber_package import WilberPackage
 
 User = settings.AUTH_USER_MODEL
-
+logger = logging.getLogger(__name__)
 
 def get_image_path(instance, filename, remove=True):
     return PathAndRename('images', remove)(instance, filename)
@@ -32,7 +32,7 @@ def get_file_path(instance, filename, remove=True):
 
 
 
-class Asset(models.Model):
+class Asset(TimeStampedModel, models.Model):
     CATEGORIES = [
         ('brushes', 'Brush'),
         ('patterns', 'Pattern'),
@@ -53,7 +53,7 @@ class Asset(models.Model):
     description = models.TextField(max_length=3000)
     source = models.URLField(null=True, blank=True)
 
-    file = models.FileField(max_length=255, upload_to = get_file_path,
+    file = models.FileField(max_length=255, upload_to=get_file_path,
         null=True, blank=True,
         validators=[FileValidator(max_size=10*2**20)]
         )
@@ -62,7 +62,7 @@ class Asset(models.Model):
 
 
     image = ProcessedImageField(max_length=255, upload_to = get_image_path,
-                                           default = 'images/no-img.png',
+                                           default ='images/no-img.png',
                                            null=True, blank=True,
                                            validators=[FileValidator(max_size=10*2**20)],
                                            processors=[ResizeToFit(2048, 2048)],
@@ -78,7 +78,7 @@ class Asset(models.Model):
 
     num_likes = models.PositiveIntegerField(default=0,  editable=False)
     num_downloads = models.PositiveIntegerField(default=0,  editable=False)
-    num_shares = models.PositiveIntegerField(default=0,  editable=False)
+    num_views = models.PositiveIntegerField(default=0,  editable=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -89,6 +89,9 @@ class Asset(models.Model):
     def get_absolute_url(self):
         #return reverse('asset:detail', kwargs={'pk': self.pk})
         return reverse('asset:detail-slug', kwargs={'slug': self.slug})
+
+    def url(self):
+        return self.get_absolute_url()
 
     def edit_url(self):
         #return reverse('asset:edit', kwargs={'pk': self.pk})
@@ -134,6 +137,16 @@ class Asset(models.Model):
         except Like.DoesNotExist:
             return False
 
+    def toggle_like(self, user):
+        like, created = self.do_like(user)
+        if not created:
+            self.unlike(user)
+            return False
+        else:
+            return True
+
+
+
 
 
 class Like(models.Model):
@@ -166,9 +179,10 @@ def rename_file(asset, file_field, get_path):
         old_filename = file_field.name
         new_filename = get_path(asset, old_filename, False)
         # Create new file and remove old one
+        logger.info("RENAME FROM %s TO %s", old_filename, new_filename)
         if new_filename != old_filename:
-            file_field.storage.delete( new_filename )
-            file_field.storage.save( new_filename, file_field )
+            file_field.storage.delete(new_filename)
+            file_field.storage.save(new_filename, file_field)
             file_field.name = new_filename
             file_field.close()
             file_field.storage.delete(old_filename)
@@ -182,6 +196,14 @@ def rename_files(asset):
     rename_file(asset, asset.image, get_image_path)
 
 
+def process_package(file_field, pk, slug):
+
+    wilber_package = WilberPackage(file_field.path)
+    new_package, message = wilber_package.process(pk, slug)
+    print(message)
+    if new_package:
+        file_field.save(file_field.name, File(open(new_package, 'rb')))
+    wilber_package.clean()
 
 
 @receiver(post_save, sender=Asset)
@@ -190,8 +212,12 @@ def post_save_asset(sender, **kwargs):
     signals.post_save.disconnect(post_save_asset, sender=Asset)
     asset = kwargs["instance"]
 
+
     rename_files(asset)
     asset.save()
+    if asset.file:
+        process_package(asset.file, asset.pk, asset.slug)
+
     update_filesize(asset)
     asset.save()
     signals.post_save.connect(post_save_asset, sender=Asset)

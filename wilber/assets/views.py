@@ -10,19 +10,36 @@ from .models import *
 class AssetListView(generic.ListView):
     model = Asset
 
+    paginate_by = 24
+
+
+    def get_queryset(self, *args, **kwargs):
+        #queryset = super(AssetListView, self).get_queryset(*args, **kwargs)
+
+        queryset = Asset.objects.select_related('owner')
+        return queryset
+
 
 class AssetFilteredListView(generic.ListView):
     model = Asset
     context_object_name = 'asset_list'
 
+    paginate_by = 24
+
     def get_queryset(self):
         category = self.kwargs['category']
-        queryset = Asset.objects.filter(category=category)
+        queryset = Asset.objects.filter(category=category).select_related('owner')
         return queryset
 
 
 class AssetDetailView(generic.DetailView):
     model = Asset
+
+    def get_object(self, *args):
+        object = super(AssetDetailView, self).get_object(*args)
+        object.num_views += 1
+        object.save()
+        return object
 
 
 class AssetUpdateView(generic.UpdateView):

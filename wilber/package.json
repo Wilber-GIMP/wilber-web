@@ -1,0 +1,19 @@
+{
+  "name": "wilberbulma",
+  "version": "1.0.0",
+  "description": "",
+  "main": "static/sass/bulma-wilber.scss",
+  "scripts": {
+    "css-build": "node-sass --omit-source-map-url static/scss/bulma-wilber.scss static/css/bulma-wilber.css",
+    "css-watch": "npm run css-build -- --watch",
+    "start": "npm run css-watch",
+    "build": "npm install node-sass --save-dev && npm install bulma --save-dev"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "bulma": "^0.8.0",
+    "node-sass": "^4.13.0"
+  },
+  "dependencies": {}
+}

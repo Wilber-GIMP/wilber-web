@@ -1,41 +1,125 @@
 {% extends "base.html" %}
-
 {% load asset_tags %}
-
 {% block content %}
-        <section id="grid" class="grid clearfix">
-            <div class="item ">
-                <a href="#">
-                    <figure>
-                        <img src="{{ object.image.url }}" />
-                        <figcaption>
-                            <h2>{{ object.name }}</h2>
-                            <p>{{ object.description }}</p>
-                            <button>View</button>
-                        </figcaption>
-                    </figure>
-                </a>
-                <div class="item-atributes">
-                    {% asset_liked object request.user as is_liked %}
-                        {% if is_liked  %}
-                        <a href="#" onclick="do_unlike({{object.pk}});" ><i class="fas fa-heart"></i></a>
-                        {% else %}
-                        <a href="#" onclick="do_like({{object.pk}});" ><i class="far fa-heart"></i></a>
-                        {% endif %}
 
-                    <span>{{ object.num_likes }}</span>
-                    <i class="far fa-arrow-alt-circle-down"></i>
-                    <span>{{ object.num_downloads }}</span>
-                    <i class="fas fa-share-alt"></i>
-                    <span>{{ object.num_shares }}</span>
-                </div>
+<section class="section">
+    <div class="container">
+        <div class="columns">
+            <div class="column is-half">
+                <figure class="image">
+                    <img src="{{asset.image.url}}">
+                </figure>
             </div>
+            <div class="column">
 
-            {% if object.file %}
-            <h1><a href={{ object.file.url }}>DOWNLOAD</a></h1>
-            {% endif %}
 
-            {% if object.owner == request.user %}<a href={{object.edit_url}}><h2>Edit</h2></a>{%endif%}
+                {% if user.is_authenticated and request.user == asset.owner %}
+                <div class="columns">
+                    <div class="column">
+                        <h1>{{asset.name}}</h1>
+                    </div>
 
-        </section>
+                    <div class="column">
+
+
+                        <div class="field has-addons">
+                            <p class="control">
+                                <a class="button is-warning" href="{{object.edit_url}}">
+                                    <span class="icon is-small"><i class="fas fa-download"></i></span>
+                                    <span>Edit</span>
+                                </a>
+
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+                {% else %}
+                <h1>{{asset.name}}</h1>
+                {% endif %}
+
+                <div class="has-text-justified"><span>{{asset.description}}</span></div>
+
+                <br>
+
+
+
+
+
+                <div class="tags has-addons">
+                    <button id="like_button" class="button is-danger" href="{{ asset.do_like }}">
+
+
+                        <span class="icon is-small">
+
+                            {% asset_liked object request.user as is_liked %}
+
+
+                            {% if is_liked %}
+                            <i id="like_icon" class="fas fa-heart"></i>
+                            {% else %}
+                            <i id="like_icon" class="far fa-heart"></i>
+                            {% endif %}
+
+                        </span>
+
+
+                        <span><span id="num_likes"> {{asset.num_likes}}</span></span>
+
+                    </button>
+
+
+
+                    <span class="tag is-warning">
+                    <span class="icon is-small"><i class="fas fa-download"></i></span>
+                    <span> {{asset.num_downloads}}</span>
+
+                    </span>
+                    <span class="tag is-info">
+                    <span class="icon is-small"><i class="fas fa-eye"></i></span>
+                    <span> {{asset.num_views}}</span>
+                </span>
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-narrow">
+                <a class="button is-primary is-large" href="{{asset.file.url}}">Download</a>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock content %}
+{% block scripts %}
+{% if user.is_authenticated %}
+<script>
+
+    $("#like_button").click( function()
+       {
+            $.getJSON("/api/asset/{{asset.id}}/toggle_like/", function(data){
+                $("#num_likes").text(data['likes']);
+                if(data['liked']){
+                    $("#like_icon").removeClass('far').addClass('fas');
+                }
+                else{
+                    $("#like_icon").removeClass('fas').addClass('far');
+                }
+
+            })
+       }
+    );
+
+
+</script>
+{% endif %}
+
+
+{% endblock scripts %}

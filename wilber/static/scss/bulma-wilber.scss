@@ -1,0 +1,96 @@
+@charset "utf-8";
+
+// Import a Google Font
+@import "../../node_modules/bulma/sass/utilities/initial-variables.sass";
+
+
+
+@import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
+
+
+//my variables
+$color-text: $white;
+$color-text-strong: $white;
+$color-background: #29353b;
+
+
+
+//$card-color: $red;
+
+//$card-shadow: 0 0.2em 1em -0.125em rgba($red, 0.2), 0 0px 0 2px rgba($blue, 0.2);
+//$card-background-color: $blue;
+
+// bulma variables
+
+
+$link-hover:$cyan;
+
+$scheme-main-bis: $black;
+
+//$navbar-item-hover-color: $red;
+//$navbar-item-color: $green;
+
+
+$scheme-main-ter: $red;
+$scheme-main: $color-background;
+$grey-dark: $color-text;
+$text-strong:   $color-text-strong;
+
+.card.is-fullheight{
+
+    height: 100%
+}
+  
+
+.card.has-effect {
+  transition: transform .5s;
+
+  &::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity 2s cubic-bezier(.165, .84, .44, 1);
+    box-shadow: 0 8px 17px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .15);
+    content: '';
+    opacity: 0;
+    z-index: -1;
+  }
+
+  &:hover,
+  &:focus {
+    transform: scale3d(1.020, 1.020, 1);
+    box-shadow: 0 8px 17px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .15);
+
+    &::after {
+      opacity: 1;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+// Import only what you need from Bulma
+
+@import "../../node_modules/bulma/sass/utilities/_all.sass";
+@import "../../node_modules/bulma/sass/base/_all.sass";
+@import "../../node_modules/bulma/sass/components/_all.sass";
+@import "../../node_modules/bulma/sass/elements/_all.sass";
+@import "../../node_modules/bulma/sass/form/_all.sass";
+@import "../../node_modules/bulma/sass/grid/_all.sass";
+@import "../../node_modules/bulma/sass/layout/_all.sass";
+
+
+
+
+
+

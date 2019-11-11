@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load account %}
 {% load socialaccount %}
 {% block content %}
 
@@ -6,6 +7,13 @@
 
 {% providers_media_js %}
 <div class="grid">
+
+    {% if user.is_authenticated %}
+    <h1> I am autheticathed as <a href="{{ user.get_absolute_url }}">{% user_display user %}</a></h1>
+    {{ accounts.logout }}
+    {% endif %}
+
+
     <p>
 <a href="{% provider_login_url "facebook" method="js_sdk" %}">Facebook Connect</a>
 </p>

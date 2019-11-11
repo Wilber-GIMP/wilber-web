@@ -22,7 +22,6 @@ class MyCustomSignupForm(SignupForm):
     
     def __init__(self, *args, **kwargs):
         super(MyCustomSignupForm, self).__init__(*args, **kwargs)
-        print("YESSSSS")
 
     def save(self, request):
 

@@ -1,11 +1,12 @@
-from rest_framework import serializers, viewsets, generics
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework.fields import CurrentUserDefault
+from rest_framework import serializers, viewsets
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import rest_framework as filters
+import django_filters
 
 from .models import *
 from users.models import User, UserProfile
@@ -158,6 +159,23 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
 
 
 
+class AssetFilter(filters.FilterSet):
+    created_gte = django_filters.DateTimeFilter(field_name="created", lookup_expr='gte')
+    modified_gte = django_filters.DateTimeFilter(field_name="modified", lookup_expr='gte')
+
+    created_lte = django_filters.DateTimeFilter(field_name="created", lookup_expr='lte')
+    modified_lte = django_filters.DateTimeFilter(field_name="modified", lookup_expr='lte')
+    class Meta:
+        model = Asset
+        fields = [
+        'name',
+        'category',
+        'description',
+        'created', 'created_gte', 'created_lte',
+        'modified', 'modified_gte', 'modified_lte',
+        'owner__username', 'owner__name'
+        ]
+
 
 class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
     #permission_classes = (IsAuthenticated,)
@@ -165,7 +183,8 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
     serializer_class = AssetSerializer
 
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filterset_fields = ['name', 'category', 'description', 'owner__username', 'owner__name']
+    filterset_fields = ['name', 'category', 'description','created', 'modified', 'owner__username', 'owner__name']
+    filter_class = AssetFilter
     search_fields = ['name', 'category', 'description', 'owner__username', 'owner__name']
     #search_fields = ['name', 'owner__username']
     serializer_action_classes = {
@@ -194,21 +213,16 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
         user = request.user
         like, created = asset.do_like(user)
         asset.refresh_from_db()
-
         if created:
             status = 'liked by %s' % user
         else:
             status = 'already liked by %s at %s' % (user, like.timestamp)
-
         return Response({'status':status, 'likes':asset.num_likes})
-
-
 
     @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
     def unlike(self, request, pk=None):
         asset = self.get_object()
         user = request.user
-
         unliked = asset.unlike(user)
         asset.refresh_from_db()
 
@@ -218,6 +232,17 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
             status = 'this asset was not liked by this user'
 
         return Response({'status':status, 'likes':asset.num_likes})
+
+    @action(detail=True, methods=['get', ], permission_classes=[IsAuthenticated], url_name='like')
+    def toggle_like(self, request, pk=None):
+        asset = self.get_object()
+        user = request.user
+        toggle = asset.toggle_like(user)
+        asset.refresh_from_db()
+        status = toggle
+
+        return Response({'status': status, 'likes': asset.num_likes, 'liked':toggle })
+
 
     @action(detail=True, methods=['get'])
     def download(self, request, pk=None):

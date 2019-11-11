@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
+import sys
 import os
 import sentry_sdk
 from os.path import dirname, abspath, join
@@ -21,6 +22,11 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = dirname(dirname(dirname(abspath(__file__))))
+APPS_DIR = os.path.join(BASE_DIR, 'apps')
+
+sys.path.insert(0, APPS_DIR)
+
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -63,6 +69,8 @@ THIRD_PARTY_APPS = [
     'massadmin',
     'imagekit',
     'request',
+    'webpack_loader',
+    'bulma',
 
 ]
 
@@ -72,6 +80,7 @@ SITE_ID = 1
 LOCAL_APPS = [
     'assets.apps.AssetsConfig',
     'users.apps.UsersConfig',
+    'apps.core.apps.CoreConfig',
 ]
 
 SITE_ID = 1
@@ -213,6 +222,17 @@ STATICFILES_DIRS = (
 )
 
 
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'webpack_bundles/', # must end with slash
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'TIMEOUT': None,
+        'IGNORE': ['.+\.hot-update.js', '.+\.map']
+    }
+}
+
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -230,7 +250,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
         #'rest_framework.authentication.BasicAuthentication',
-        #'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
 
     ],
 
@@ -244,3 +264,6 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
+
+
+

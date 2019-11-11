@@ -16,6 +16,9 @@ class ProfileInline(admin.StackedInline):
 class CustomUserAdmin(UserAdmin):
     #inlines = (ProfileInline, )
 
+    list_display = ('username', 'email', 'name', 'is_staff')
+    search_fields = ('username', 'name', 'email')
+
     fieldsets = UserAdmin.fieldsets + (
             (None, {'fields': ('name',)}),
     )

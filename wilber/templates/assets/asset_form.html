@@ -1,14 +1,32 @@
 {% extends "base.html" %}
-
+{% load bulma_tags %}
 {% block content %}
-{%if object.pk %} <h1>EDIT ASSET</h1>{%else%}<h1>NEW ASSET</h1>{%endif%}
+<section class="section">
+    <div class="content">
+        {%if object.pk %} <h1>EDIT ASSET</h1>{%else%}<h1>NEW ASSET</h1>{%endif%}
 
 
         <form action="" enctype="multipart/form-data" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Submit">
-      </form>
+            {% csrf_token %}
+            {{ form | bulma}}
+            <div class="columns">
+                <div class="column has-text-centered">
+                    <input class="button is-large is-primary" type="submit" value="Submit">
+                    <a class="button is-small is-warning" href="{{object.url}}">Cancel</a>
+                </div>
+                <div class="column has-text-centered">
 
-      <a href="{{object.delete_url}}"><h1>Delete</h1></a>
+                </div>
+                <div class="column has-text-right">
+                    <a class="button is-small is-danger" href="{{object.delete_url}}">Delete</a>
+                </div>
+
+            </div>
+
+
+        </form>
+        <br>
+
+    </div>
+</section>
 {% endblock content %}

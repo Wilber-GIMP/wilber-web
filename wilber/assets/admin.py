@@ -36,9 +36,9 @@ class AssetAdmin(admin.ModelAdmin):
 
     image_tag.short_description = 'Image'
 
-    readonly_fields = ('image_tag',)
+    readonly_fields = ('image_tag', 'slug', 'created', 'modified')
     list_display = ['name', 'category', 'owner', 'get_filesize', 'num_likes', 'image', 'slug']
-    search_fields = ['name']
+    search_fields = ['name', 'owner__username']
     list_filter = ['category',]
     actions = [recalculate_likes]
 

@@ -1,26 +1,54 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Wilber - Share Grafic Assets</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/logo_100.png' %}"/>
+    <!--
     <link  rel="stylesheet" href="{% static 'libs/simple-grid.min.css' %}">
     <link  rel="stylesheet" href="{% static 'assets/wilber.css' %}">
+    -->
+    <link rel="stylesheet" href="{% static 'css/bulma-wilber.css' %}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
 </head>
 <body>
-<div class="container">
+{% block bodyhead %}
+{% endblock bodyhead %}
+
+{% include 'navbar.html' %}
+
+<div class="content">
 
     {% block content %}
 
     {% endblock %}
 </div>
 
-<script src="{% static 'assets/jquery-3.4.1.js' %}"></script>
-<script src="{% static 'libs/snap.svg-min.js' %}"></script>
+<script src="{% static 'assets/jquery-3.4.1.min.js' %}"></script>
+
 <script src="{% static 'assets/wilber.js' %}"></script>
 {% block scripts %}
-{% endblock scripts %}
+{% endblock %}
+
+<script>
+
+    $(document).ready(function() {
+
+  // Check for click events on the navbar burger icon
+  $(".navbar-burger").click(function() {
+
+      // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+      $(".navbar-burger").toggleClass("is-active");
+      $(".navbar-menu").toggleClass("is-active");
+
+  });
+});
+
+
+</script>
 
 </body>
 </html>

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="columns has-text-centered">
+    <div class="column">
+        <img src="{% static 'images/logo-wilber.svg' %}" width="300" height="300">
+        <h1 class="title">Wilber Social</h1>
+        <br>
+        <h3 class="subtitle">Share and Download Graphic Assets<br>You can find GIMP Bruches, Color Pallets and many
+            more.</h3>
+    </div>
+</div>
+
+<section class="section">
+    <div class="columns is-centered">
+        <div class="column is-three-quarters">
+            <div class="tile is-ancestor has-text-centered">
+
+
+                <div class="tile">
+                    <div class="tile is-parent is-vertical">
+                        <article class="tile is-child  is-primary">
+                            <p class="subtitle">Download the Plugin for GIMP to upload or download the Assets</p>
+
+                        </article>
+                        <article class="tile is-child  is-warning">
+                            <a class="button is-primary is-large" href="{% url 'download' %}">Download</a>
+
+                        </article>
+                    </div>
+
+                </div>
+                <div class="tile">
+                    <div class="tile is-parent is-vertical">
+                        <article class="tile is-child  is-primary">
+                            <p class="subtitle">Access our site to download the availables Assets</p>
+
+                        </article>
+                        <article class="tile is-child  is-warning">
+                            <a class="button is-primary is-large" href="{% url 'asset:list' %}">Access Site</a>
+
+                        </article>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+
+{% endblock content %}

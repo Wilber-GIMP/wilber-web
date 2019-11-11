@@ -1,46 +1,77 @@
 {% extends "account/base.html" %}
-
+{% load bulma_tags %}
 {% load i18n %}
+{% load static %}
 {% load account socialaccount %}
 
 {% block head_title %}{% trans "Sign In" %}{% endblock %}
 
 {% block content %}
+<section class="section">
+    <div class="content">
+        <div class="columns">
+            <div class="column">
 
-<h1>{% trans "My Sign In" %}</h1>
+                <h1>{% trans "Login" %}</h1>
 
-{% get_providers as socialaccount_providers %}
+                {% get_providers as socialaccount_providers %}
 
-{% if socialaccount_providers %}
-<p>{% blocktrans with site.name as site_name %}Please sign in with one
-of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
-for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
+                {% if socialaccount_providers %}
+                <p>{% blocktrans with site.name as site_name %}Please sign in with one
+                    of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
+                    for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
 
-<div class="socialaccount_ballot">
+                <div class="socialaccount_ballot">
 
-  <ul class="socialaccount_providers">
-    {% include "socialaccount/snippets/provider_list.html" with process="login" %}
-  </ul>
+                    <ul class="ul socialaccount_providers">
+                        {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                    </ul>
 
-  <div class="login-or">{% trans 'or' %}</div>
+                    <a href="/accounts/google/login/?process=login">
 
-</div>
+                        <img src="{% static 'images/btn_google_signin_light_normal_web.png' %}">
+                    </a>
 
-{% include "socialaccount/snippets/login_extra.html" %}
 
-{% else %}
-<p>{% blocktrans %}If you have not created an account yet, then please
-<a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
-{% endif %}
 
-<form class="login" method="POST" action="{% url 'account_login' %}">
-  {% csrf_token %}
-  {{ form.as_p }}
-  {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-  {% endif %}
-  <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-  <button class="primaryAction" type="submit">{% trans "Sign In" %}</button>
-</form>
+                    <div class="fb-login-button" data-width="" data-size="large" data-button-type="continue_with" data-auto-logout-link="false" data-use-continue-as="true"></div>
+
+
+
+
+                    <div class="login-or">{% trans 'or' %}</div>
+
+                </div>
+
+                {% include "socialaccount/snippets/login_extra.html" %}
+
+                {% else %}
+                <p>{% blocktrans %}If you have not created an account yet, then please
+                    <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
+                {% endif %}
+
+                <form class="form login" method="POST" action="{% url 'account_login' %}">
+                    {% csrf_token %}
+
+                    {{ form|bulma }}
+
+                    {% if redirect_field_value %}
+                    <div class="field">
+                        <input class="input" type="hidden" name="{{ redirect_field_name }}"
+                               value="{{ redirect_field_value }}"/>
+                    </div>
+                    {% endif %}
+                    <a class="button is-warning secondaryAction" href="{% url 'account_reset_password' %}">
+                        {% trans "Forgot Password?" %}
+                    </a>
+                    <button class="button is-primary primaryAction" type="submit">{% trans "Sign In" %}</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</section>
+
 
 {% endblock %}

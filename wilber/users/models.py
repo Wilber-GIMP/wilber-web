@@ -15,6 +15,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
+from django_extensions.db.models import TimeStampedModel
+
+
 class UserManager(BaseUserManager):
     def _create_user(self, username, email, password, is_staff, is_superuser, **extra_fields):
         now = timezone.now()
@@ -81,6 +84,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_absolute_url(self):
         return reverse('user:detail', kwargs={'username': self.username})
 
+    def url(self):
+        return self.get_absolute_url()
+
     def get_full_name(self):
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
@@ -100,7 +106,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 
-class UserProfile(models.Model):
+class UserProfile(TimeStampedModel):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
 
     photo = models.ImageField(verbose_name=_("Profile Picture"), upload_to="profiles", default = 'profiles/none/no-image-profile.png', max_length=255, null=True, blank=True)
@@ -110,13 +116,22 @@ class UserProfile(models.Model):
     organization = models.CharField(max_length=100, default='', blank=True)
 
     website = models.URLField(default='', blank=True)
-    facebook = models.URLField(default='', blank=True)
-    instagram = models.URLField(default='', blank=True)
+    facebook = models.CharField(max_length=50, default='', blank=True)
+    instagram = models.CharField(max_length=50, default='', blank=True)
 
     birthday = models.DateField(null=True, blank=True)
 
     city = models.CharField(max_length=100, default='', blank=True)
     country = models.CharField(max_length=100, default='', blank=True)
+
+
+    @property
+    def name(self):
+        return self.user.get_name()
+
+    @property
+    def username(self):
+        return self.user.username
 
     def get_absolute_url(self):
         return reverse('user:detail', kwargs={'username': self.user.username})

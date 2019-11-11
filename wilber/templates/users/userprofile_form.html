@@ -1,12 +1,15 @@
 {% extends "base.html" %}
-
+{% load bulma_tags %}
 {% block content %}
-        <h1>EDITING USERNAME: {{profile.user.username}}</h1>
-        
+<section class="section">
+    <div class="content">
+        <h1 class="h1">Username: {{user.username}}</h1>
+
         <form action="" enctype="multipart/form-data" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Submit">
-      </form>
-        
+            {% csrf_token %}
+            {{ form|bulma}}
+            <input class="button is-primary" type="submit" value="Submit">
+        </form>
+    </div>
+</section>
 {% endblock content %}

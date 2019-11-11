@@ -16,14 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.conf.urls import url
 from django.urls import path, include
-from django.conf import settings
-from django.contrib.auth import views as auth_views
-
 
 from django.views.generic import TemplateView
 from rest_framework import routers
 from rest_framework.authtoken import views
 
+from apps.core.views import *
 from users.views import SignupView
 from assets.views import *
 from assets.api import *
@@ -58,11 +56,21 @@ urlpatterns = [
     path('social-login/', TemplateView.as_view(template_name='pages/social-login.html'), name='social-login'),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('asset-django/', include('assets.urls', namespace='asset'),  ),
-    path('user/', include('users.urls', namespace='user'),  ),
+    path('asset/', include('assets.urls', namespace='asset')),
+    path('user/', include('users.urls', namespace='user')),
     path('django/', AssetListView.as_view()),
-    #path('', AssetListView.as_view()),
-    path('', react_view),
+    path('react/', react_view),
+
+    path('about/', TemplateView.as_view(template_name='pages/about.html'), name='about'),
+    path('privacy/', TemplateView.as_view(template_name='pages/privacy.html'), name='privacy'),
+    path('terms/', TemplateView.as_view(template_name='pages/terms.html'), name='terms'),
+    path('download/', TemplateView.as_view(template_name='pages/download.html'), name='download'),
+
+    path('report/', ReportIssue.as_view(), name='report'),
+    path('', TemplateView.as_view(template_name='pages/home.html'), name='home'),
+
+    #path('', AssetListView.as_view(), name='assets'),
+
 ]
 
 
@@ -78,6 +86,6 @@ if settings.DEBUG:
     ] + urlpatterns
 
 
-urlpatterns += [
-    url(r'^(?:.*)/?$', react_view),
-]
+#urlpatterns += [
+#    url(r'^(?:.*)/?$', react_view),
+#]

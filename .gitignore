@@ -103,3 +103,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# node
+*node_modules/
+
+
+.idea/
+*.sqlite
+*.sqlite3

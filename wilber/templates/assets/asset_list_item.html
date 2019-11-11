@@ -1,0 +1,55 @@
+<div class="card is-fullheight has-effect">
+    <a href="{{ asset.url }}">
+        <div class="card-image">
+            <figure class="image is-4by3">
+
+                <img src="{{ asset.image_thumbnail.url }}" alt="Placeholder image">
+            </figure>
+        </div>
+    </a>
+    <div class="card-content">
+        <div class="media">
+
+            <div class="media-content">
+                <a class="is-text" href="{{ asset.url }}"><p class="title is-5">{{asset.name}}</p></a>
+                <br>
+
+
+            </div>
+        </div>
+        <div class="content">
+            <a class="tag is-rounded is-black" href="{{ asset.owner.url }}">
+                <p class="subtitle is-6">
+                    @{{asset.owner.username}}</p>
+            </a>
+        </div>
+
+
+        <footer class="card-footer">
+
+
+
+
+            <br>
+            <div class="tags has-addons">
+
+                <span class="tag is-danger">
+                    <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                    <span><span id="num_likes"> {{asset.num_likes}}</span></span>
+                </span>
+
+                <span class="tag is-warning">
+                    <span class="icon is-small"><i class="fas fa-download"></i></span>
+                    <span> {{asset.num_downloads}}</span>
+                </span>
+                <span class="tag is-info">
+                    <span class="icon is-small"><i class="fas fa-eye"></i></span>
+                    <span> {{asset.num_views}}</span>
+                </span>
+
+            </div>
+        </footer>
+
+
+    </div>
+</div>
