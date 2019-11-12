@@ -186,14 +186,16 @@ SOCIALACCOUNT_PROVIDERS = {
 
     'facebook': {
         'METHOD': 'oauth2',
-        'SCOPE': ['email', 'public_profile', 'user_friends'],
+        'SCOPE': ['email', 'public_profile', ],
         'AUTH_PARAMS': {'auth_type': 'https'},
         'INIT_PARAMS': {'cookie': True},
         'FIELDS': [
             'id',
             'email',
             'name',
+            'picture',
             'first_name',
+            'middle_name',
             'last_name',
             'verified',
             'locale',
