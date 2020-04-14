@@ -1,26 +1,19 @@
 from .base import *  # noqa
-#from .base import env
-from .secrets import *
+
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = True
 
 
-
-sentry_sdk.init(
-    dsn=SENTRY_DSN,
-    integrations=[DjangoIntegration()]
-)
+# sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()])
 
 
-#SECRET_KEY = "Kk2I0vDBjJNKlr84BHi8iAHzkEpjfX2hEi5oq9Kmnt542ZH2pg9oPpblf5sbAkcx"
+# SECRET_KEY = "Kk2I0vDBjJNKlr84BHi8iAHzkEpjfX2hEi5oq9Kmnt542ZH2pg9oPpblf5sbAkcx"
 
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
-
-
 
 
 # CACHES
@@ -34,7 +27,6 @@ CACHES = {
 }
 
 
-
 # EMAIL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
@@ -46,20 +38,16 @@ EMAIL_HOST = "localhost"
 EMAIL_PORT = 1025
 
 
-
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#prerequisites
-INSTALLED_APPS += [
-    "debug_toolbar",
-    ]  # noqa F405
-
+INSTALLED_APPS += ["debug_toolbar", "django_test_tools"]  # noqa F405
 
 
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#middleware
-MIDDLEWARE += [
+MIDDLEWARE += [  # noqa F405
     "debug_toolbar.middleware.DebugToolbarMiddleware",
-    "request.middleware.RequestMiddleware",
+    # "request.middleware.RequestMiddleware",
 ]  # noqa F405
 
 

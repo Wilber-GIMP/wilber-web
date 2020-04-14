@@ -15,7 +15,7 @@
                     <div class="media">
                         <div class="media-left">
                             <figure class="image is-48x48">
-                                <img src="{{ profile.photo.url }}" alt="Placeholder image">
+                                <img style="object-fit: cover;" src="{{ profile.photo.url }}" alt="Placeholder image">
                             </figure>
                         </div>
                         <div class="media-content">
@@ -78,27 +78,33 @@
 
             <th>Name</th>
             <th>Category</th>
+            {% if request.user == profile.user %}
             <th>Size</th>
+
             <th>Delete</th>
+            {% endif %}
         </tr>
         </thead>
 
         <tbody>
-        {% for object in user.assets.all %}
+        {% for object in profile.user.assets.all %}
         <tr>
 
             <td><a href="{{object.edit_url}}">{{object.name}}</a></td>
             <td>{{object.category}}</td>
+            {% if request.user == profile.user %}
             <td>{{object.filesize|filesizeformat}}</td>
+
             <td><a href={{object.delete_url}}>delete</a></td>
+            {% endif %}
         </tr>
         {% endfor %}
-
+        {% if request.user == profile.user %}
         <td>TOTAL</td>
         <td></td>
 
         <td><strong>{{user.profile.quota_used|filesizeformat}}</strong></td>
-
+        {% endif %}
         </tbody>
     </table>
 </section>

@@ -1,13 +1,14 @@
 import graphene
-
 from graphene_django.types import DjangoObjectType
 
-from .models import *
+from apps.users.models import User
+from apps.users.models import UserProfile
 
 
 class UserType(DjangoObjectType):
     class Meta:
         model = User
+
 
 class UserProfileType(DjangoObjectType):
     class Meta:
@@ -20,8 +21,6 @@ class Query(object):
 
     def resolve_all_users(self, info, **kwargs):
         return User.objects.all()
-        
+
     def resolve_all_user_profiles(self, info, **kwargs):
         return UserProfile.objects.all()
-
-x

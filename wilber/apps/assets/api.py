@@ -1,15 +1,18 @@
-from rest_framework import serializers, viewsets
-from rest_framework.permissions import IsAuthenticated
+import django_filters
+from django_filters import rest_framework as filters
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import serializers
+from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from rest_framework.filters import SearchFilter
-from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import rest_framework as filters
-import django_filters
+from apps.assets.models import Asset
+from apps.assets.models import Like
+from apps.users.models import User
+from apps.users.models import UserProfile
 
-from .models import *
-from users.models import User, UserProfile
 
 class MultiSerializerViewSetMixin(object):
     def get_serializer_class(self):
@@ -36,33 +39,42 @@ class MultiSerializerViewSetMixin(object):
         try:
             return self.serializer_action_classes[self.action]
         except (KeyError, AttributeError):
-            return super(MultiSerializerViewSetMixin, self).get_serializer_class()
-
-
+            return super(
+                MultiSerializerViewSetMixin, self
+            ).get_serializer_class()
 
 
 class AssetListSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
 
     folder = serializers.ReadOnlyField()
-    username = serializers.CharField(source='owner', read_only=True)
-    search_fields = ['name', 'description']
+    username = serializers.CharField(source="owner", read_only=True)
+    search_fields = ["name", "description"]
     image_thumbnail = serializers.ImageField(read_only=True)
-    is_liked = serializers.SerializerMethodField('_is_liked')
+    is_liked = serializers.SerializerMethodField("_is_liked")
 
     def _is_liked(self, obj):
-        request = self.context.get('request')
+        request = self.context.get("request")
         if request:
             return obj.is_liked(request._user)
         return None
 
-
     class Meta:
         model = Asset
 
-        fields = ['id', 'url', 'username', 'category', 'name', 'image', 'image_thumbnail',  'file', 'folder', 'num_likes', 'is_liked' ]
-
-
+        fields = [
+            "id",
+            "url",
+            "username",
+            "category",
+            "name",
+            "image",
+            "image_thumbnail",
+            "file",
+            "folder",
+            "num_likes",
+            "is_liked",
+        ]
 
 
 class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
@@ -70,17 +82,18 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = '__all__'
+        fields = "__all__"
+
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.IntegerField(read_only=True)
     profile = UserProfileSerializer(read_only=True)
-    #assets = serializers.HyperlinkedRelatedField(many=True, view_name='asset-detail', read_only=True)
     assets = AssetListSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
-        exclude = ['password', 'user_permissions']
+        exclude = ["password", "user_permissions"]
+
 
 class UserInlineSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.IntegerField(read_only=True)
@@ -88,47 +101,38 @@ class UserInlineSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = User
-        exclude = ['password', 'user_permissions']
+        exclude = ["password", "user_permissions"]
+
 
 class UserListSerializer(serializers.HyperlinkedModelSerializer):
-    #profile = UserProfileSerializer(read_only=True)
-    #assets = serializers.HyperlinkedRelatedField(many=True, view_name='asset-detail', read_only=True)
     class Meta:
         model = User
-        fields = ['id', 'url', 'name', 'username']
-
+        fields = ["id", "url", "absolute_url", "name", "username"]
 
 
 class UserViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
-    serializer_action_classes = {
-        'list': UserListSerializer,
-    }
-    #permission_classes = (IsAuthenticated,)
+    serializer_action_classes = {"list": UserListSerializer}
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
-    #permission_classes = (IsAuthenticated,)
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
 
 
-
 class LikeSerializer(serializers.ModelSerializer):
-    #view_name = 'like-detail'
-
-    user = serializers.HyperlinkedRelatedField(read_only=True, view_name='user-detail')
-    username = serializers.CharField(source='user', read_only=True)
-    name = serializers.CharField(source='user.get_full_name', read_only=True)
-    photo = serializers.CharField(source='user.profile.photo', read_only=True)
-    #asset = serializers.PrimaryKeyRelatedField(read_only=True)
+    user = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="user-detail"
+    )
+    username = serializers.CharField(source="user", read_only=True)
+    name = serializers.CharField(source="user.get_full_name", read_only=True)
+    photo = serializers.CharField(source="user.profile.photo", read_only=True)
 
     class Meta:
         model = Like
-        #fields = ('__all__')
-        fields = ('user', 'username', 'name', 'photo')
 
+        fields = ("user", "username", "name", "photo")
 
 
 class AssetSerializer(serializers.HyperlinkedModelSerializer):
@@ -140,56 +144,80 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
     num_downloads = serializers.ReadOnlyField()
     num_shares = serializers.ReadOnlyField()
 
+    likes = LikeSerializer(source="liked", many=True, read_only=True)
 
-    likes = LikeSerializer(source='liked', many=True, read_only=True)
-
-    current_user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
-    is_liked = serializers.SerializerMethodField('_is_liked')
+    current_user = serializers.PrimaryKeyRelatedField(
+        read_only=True, default=serializers.CurrentUserDefault()
+    )
+    is_liked = serializers.SerializerMethodField("_is_liked")
 
     def _is_liked(self, obj):
-        request = self.context.get('request')
+        request = self.context.get("request")
         if request:
             return obj.is_liked(request._user)
         return None
 
-
     class Meta:
         model = Asset
-        fields = '__all__'
-
+        fields = "__all__"
 
 
 class AssetFilter(filters.FilterSet):
-    created_gte = django_filters.DateTimeFilter(field_name="created", lookup_expr='gte')
-    modified_gte = django_filters.DateTimeFilter(field_name="modified", lookup_expr='gte')
+    created_gte = django_filters.DateTimeFilter(
+        field_name="created", lookup_expr="gte"
+    )
+    modified_gte = django_filters.DateTimeFilter(
+        field_name="modified", lookup_expr="gte"
+    )
 
-    created_lte = django_filters.DateTimeFilter(field_name="created", lookup_expr='lte')
-    modified_lte = django_filters.DateTimeFilter(field_name="modified", lookup_expr='lte')
+    created_lte = django_filters.DateTimeFilter(
+        field_name="created", lookup_expr="lte"
+    )
+    modified_lte = django_filters.DateTimeFilter(
+        field_name="modified", lookup_expr="lte"
+    )
+
     class Meta:
         model = Asset
         fields = [
-        'name',
-        'category',
-        'description',
-        'created', 'created_gte', 'created_lte',
-        'modified', 'modified_gte', 'modified_lte',
-        'owner__username', 'owner__name'
+            "name",
+            "category",
+            "description",
+            "created",
+            "created_gte",
+            "created_lte",
+            "modified",
+            "modified_gte",
+            "modified_lte",
+            "owner__username",
+            "owner__name",
         ]
 
 
 class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
-    #permission_classes = (IsAuthenticated,)
     queryset = Asset.objects.all()
     serializer_class = AssetSerializer
 
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filterset_fields = ['name', 'category', 'description','created', 'modified', 'owner__username', 'owner__name']
+    filterset_fields = [
+        "name",
+        "category",
+        "description",
+        "created",
+        "modified",
+        "owner__username",
+        "owner__name",
+    ]
     filter_class = AssetFilter
-    search_fields = ['name', 'category', 'description', 'owner__username', 'owner__name']
-    #search_fields = ['name', 'owner__username']
-    serializer_action_classes = {
-        'list': AssetListSerializer,
-    }
+    search_fields = [
+        "name",
+        "category",
+        "description",
+        "owner__username",
+        "owner__name",
+    ]
+    # search_fields = ['name', 'owner__username']
+    serializer_action_classes = {"list": AssetListSerializer}
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -199,27 +227,30 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
         Restrict the donwloads to a single asset category
         """
         queryset = Asset.objects.all()
-        category = self.request.query_params.get('category', None)
+        category = self.request.query_params.get("category", None)
         if category is not None:
             queryset = queryset.filter(category=category)
-        search = self.request.query_params.get('search', None)
-        print(search)
-        print('YESSS')
+
         return queryset
 
-    @action(detail=True, methods=['get',], permission_classes=[IsAuthenticated], url_name='like')
+    @action(
+        detail=True,
+        methods=["get"],
+        permission_classes=[IsAuthenticated],
+        url_name="like",
+    )
     def like(self, request, pk=None):
         asset = self.get_object()
         user = request.user
         like, created = asset.do_like(user)
         asset.refresh_from_db()
         if created:
-            status = 'liked by %s' % user
+            status = "liked by %s" % user
         else:
-            status = 'already liked by %s at %s' % (user, like.timestamp)
-        return Response({'status':status, 'likes':asset.num_likes})
+            status = "already liked by %s at %s" % (user, like.timestamp)
+        return Response({"status": status, "likes": asset.num_likes})
 
-    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=["get"], permission_classes=[IsAuthenticated])
     def unlike(self, request, pk=None):
         asset = self.get_object()
         user = request.user
@@ -227,13 +258,18 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
         asset.refresh_from_db()
 
         if unliked:
-            status = 'unliked'
+            status = "unliked"
         else:
-            status = 'this asset was not liked by this user'
+            status = "this asset was not liked by this user"
 
-        return Response({'status':status, 'likes':asset.num_likes})
+        return Response({"status": status, "likes": asset.num_likes})
 
-    @action(detail=True, methods=['get', ], permission_classes=[IsAuthenticated], url_name='like')
+    @action(
+        detail=True,
+        methods=["get"],
+        permission_classes=[IsAuthenticated],
+        url_name="like",
+    )
     def toggle_like(self, request, pk=None):
         asset = self.get_object()
         user = request.user
@@ -241,22 +277,20 @@ class AssetViewSet(MultiSerializerViewSetMixin, viewsets.ModelViewSet):
         asset.refresh_from_db()
         status = toggle
 
-        return Response({'status': status, 'likes': asset.num_likes, 'liked':toggle })
+        return Response(
+            {"status": status, "likes": asset.num_likes, "liked": toggle}
+        )
 
-
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def download(self, request, pk=None):
         asset = self.get_object()
         user = request.user
-        num_downloads = asset.download()
+        asset.download()
         asset.refresh_from_db()
 
         if user:
-            status = 'Downloaded by user:%s' % (user)
+            status = "Downloaded by user:%s" % (user)
         else:
-            status = 'Downloaded by anon'
+            status = "Downloaded by anon"
 
-        return Response({'status':status, 'downloads':asset.num_downloads})
-
-
-
+        return Response({"status": status, "downloads": asset.num_downloads})

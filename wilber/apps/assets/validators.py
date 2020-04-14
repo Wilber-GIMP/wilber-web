@@ -3,20 +3,20 @@
 # by dokterbob had some problems with determining the correct mimetype and
 # determining the size of the file uploaded (at least within my Django application
 # that is).
-
 # @author dokterbob
 # @author jrosebr1
-
 import mimetypes
 import os
 import time
 from os.path import splitext
+from uuid import uuid4
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import filesizeformat
 from django.utils.deconstruct import deconstructible
-from uuid import uuid4
+from django.utils.translation import gettext_lazy as _
+
 
 @deconstructible
 class FileValidator(object):
@@ -40,16 +40,28 @@ class FileValidator(object):
 
     """
 
-    extension_message = _("Extension '%(extension)s' not allowed. Allowed extensions are: '%(allowed_extensions)s.'")
-    mime_message = _("MIME type '%(mimetype)s' is not valid. Allowed types are: %(allowed_mimetypes)s.")
-    min_size_message = _('The current file %(size)s, which is too small. The minumum file size is %(allowed_size)s.')
-    max_size_message = _('The current file %(size)s, which is too large. The maximum file size is %(allowed_size)s.')
+    extension_message = _(
+        "Extension '%(extension)s' not allowed. Allowed extensions are: "
+        "'%(allowed_extensions)s.'"
+    )
+    mime_message = _(
+        "MIME type '%(mimetype)s' is not valid. Allowed types are: "
+        "%(allowed_mimetypes)s."
+    )
+    min_size_message = _(
+        "The current file %(size)s, which is too small. The minumum file size is "
+        "%(allowed_size)s."
+    )
+    max_size_message = _(
+        "The current file %(size)s, which is too large. The maximum file size is "
+        "%(allowed_size)s."
+    )
 
     def __init__(self, *args, **kwargs):
-        self.allowed_extensions = kwargs.pop('allowed_extensions', None)
-        self.allowed_mimetypes = kwargs.pop('allowed_mimetypes', None)
-        self.min_size = kwargs.pop('min_size', 0)
-        self.max_size = kwargs.pop('max_size', None)
+        self.allowed_extensions = kwargs.pop("allowed_extensions", None)
+        self.allowed_mimetypes = kwargs.pop("allowed_mimetypes", None)
+        self.min_size = kwargs.pop("min_size", 0)
+        self.max_size = kwargs.pop("max_size", None)
 
     def __call__(self, value):
         """
@@ -58,20 +70,20 @@ class FileValidator(object):
 
         # Check the extension
         ext = splitext(value.name)[1][1:].lower()
-        if self.allowed_extensions and not ext in self.allowed_extensions:
+        if self.allowed_extensions and ext not in self.allowed_extensions:
             message = self.extension_message % {
-                'extension' : ext,
-                'allowed_extensions': ', '.join(self.allowed_extensions)
+                "extension": ext,
+                "allowed_extensions": ", ".join(self.allowed_extensions),
             }
 
             raise ValidationError(message)
 
         # Check the content type
         mimetype = mimetypes.guess_type(value.name)[0]
-        if self.allowed_mimetypes and not mimetype in self.allowed_mimetypes:
+        if self.allowed_mimetypes and mimetype not in self.allowed_mimetypes:
             message = self.mime_message % {
-                'mimetype': mimetype,
-                'allowed_mimetypes': ', '.join(self.allowed_mimetypes)
+                "mimetype": mimetype,
+                "allowed_mimetypes": ", ".join(self.allowed_mimetypes),
             }
 
             raise ValidationError(message)
@@ -80,20 +92,19 @@ class FileValidator(object):
         filesize = len(value)
         if self.max_size and filesize > self.max_size:
             message = self.max_size_message % {
-                'size': filesizeformat(filesize),
-                'allowed_size': filesizeformat(self.max_size)
+                "size": filesizeformat(filesize),
+                "allowed_size": filesizeformat(self.max_size),
             }
 
             raise ValidationError(message)
 
         elif filesize < self.min_size:
             message = self.min_size_message % {
-                'size': filesizeformat(filesize),
-                'allowed_size': filesizeformat(self.min_size)
+                "size": filesizeformat(filesize),
+                "allowed_size": filesizeformat(self.min_size),
             }
 
             raise ValidationError(message)
-
 
 
 @deconstructible
@@ -110,9 +121,13 @@ class PathAndRename(object):
             os.remove(fulpath)
 
     def get_path(self, instance, filename):
-        timed_path = time.strftime('%Y/%m/%d')
+        timed_path = time.strftime("%Y/%m/%d")
         if instance.pk:
-            return os.path.join(timed_path, instance.category, '{:0>6d}__{}'.format(instance.pk, instance.slug))
+            return os.path.join(
+                timed_path,
+                instance.category,
+                "{:0>6d}__{}".format(instance.pk, instance.slug),
+            )
         else:
             return os.path.join(timed_path, instance.category)
 
@@ -120,17 +135,20 @@ class PathAndRename(object):
 
         base_filename, file_ext = os.path.splitext(filename)
         if instance.pk:
-            new_name = '{:0>6d}__{}_{}{}'.format(instance.pk, instance.category, instance.slug, file_ext)
+            new_name = "{:0>6d}__{}_{}{}".format(
+                instance.pk, instance.category, instance.slug, file_ext
+            )
         else:
-            new_name = '{}_{}_{}{}'.format(instance.category, uuid4().hex[:6], instance.slug, file_ext)
-        #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAa",new_name)
+            new_name = "{}_{}_{}{}".format(
+                instance.category, uuid4().hex[:6], instance.slug, file_ext
+            )
+        # print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAa",new_name)
         return new_name
 
     def get_full_path(self, instance, filename):
         path = self.get_path(instance, filename)
         new_filename = self.get_filename(instance, filename)
         return os.path.join(self.basepath, path, new_filename)
-
 
     def __call__(self, instance, filename):
         if self.remove:

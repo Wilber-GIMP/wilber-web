@@ -12,17 +12,16 @@ fab prod deploy
 import sys
 from functools import wraps
 
-from fabric import Connection, task
-from invoke import Responder
-from fabric.config import Config
+from fabric import Connection
+from fabric import task
 
 
-SERVER_SSH_USER = 'root'
-SERVER_URL = 'wilber.social'
+SERVER_SSH_USER = "root"
+SERVER_URL = "wilber.social"
 
-PROJECT_USER = 'django'
+PROJECT_USER = "django"
 PROJECT_NAME = "wilber"
-REPO_NAME = 'wilber-web'
+REPO_NAME = "wilber-web"
 
 PROJECT_PATH = "/home/{}/{}/{}".format(PROJECT_USER, REPO_NAME, PROJECT_NAME)
 REPO_URL = "remote_repo_url"
@@ -30,16 +29,22 @@ REPO_URL = "remote_repo_url"
 RUN_STRING = 'sudo -u {} $SHELL -c "cd {} && {}"'
 RUN_STRING = 'su {} -c "cd {} && {}"'
 
-VIRTUAL_ENV = ". /home/{}/.virtualenvs/{}/bin/activate".format(PROJECT_USER, PROJECT_NAME)
+VIRTUAL_ENV = ". /home/{}/.virtualenvs/{}/bin/activate".format(
+    PROJECT_USER, PROJECT_NAME
+)
+
 
 def user(command, folder=PROJECT_PATH):
     return RUN_STRING.format(PROJECT_USER, folder, command)
 
+
 def get_connection(ctx):
     try:
-        with Connection(ctx.host, ctx.user, connect_kwargs=ctx.connect_kwargs) as conn:
+        with Connection(
+            ctx.host, ctx.user, connect_kwargs=ctx.connect_kwargs
+        ) as conn:
             return conn
-    except Exception as e:
+    except Exception:
         return None
 
 
@@ -50,11 +55,11 @@ def connect(function):
             conn = ctx
         else:
             conn = get_connection(ctx)
-        kwargs['conn'] = conn
+        kwargs["conn"] = conn
         ret = function(ctx, *args, **kwargs)
         return ret
-    return connected
 
+    return connected
 
 
 @task
@@ -75,17 +80,17 @@ def pull(ctx, branch="master", **kwargs):
     # check if ctx is Connection object or Context object
     # if Connection object then calling method from program
     # else calling directly from terminal
-    conn = kwargs['conn']
+    conn = kwargs["conn"]
     conn.run(user("git pull origin {}".format(branch)))
 
 
 @task
 @connect
-def checkout(ctx, branch='master', **kwargs):
+def checkout(ctx, branch="master", **kwargs):
     if branch is None:
         sys.exit("branch name is not specified")
     print("branch-name: {}".format(branch))
-    conn = kwargs['conn']
+    conn = kwargs["conn"]
     conn.run(user("whoami"))
     conn.run(user("git checkout {branch}".format(branch=branch)))
 
@@ -93,30 +98,36 @@ def checkout(ctx, branch='master', **kwargs):
 @task
 @connect
 def install(ctx, **kwargs):
-    conn = kwargs['conn']
-    conn.run(user("{} && pip install -r requirements/prod.txt".format(VIRTUAL_ENV)))
+    conn = kwargs["conn"]
+    conn.run(
+        user("{} && pip install -r requirements/prod.txt".format(VIRTUAL_ENV))
+    )
 
 
 @task
 @connect
 def migrate(ctx, **kwargs):
-    conn = kwargs['conn']
+    conn = kwargs["conn"]
     conn.run(user("{} && python manage.py migrate".format(VIRTUAL_ENV)))
 
 
 @task
 @connect
 def collect(ctx, **kwargs):
-    conn = kwargs['conn']
-    conn.run(user("{} && python manage.py collectstatic --noinput".format(VIRTUAL_ENV)))
-
-
+    conn = kwargs["conn"]
+    conn.run(
+        user(
+            "{} && python manage.py collectstatic --noinput".format(
+                VIRTUAL_ENV
+            )
+        )
+    )
 
 
 @task
 @connect
 def restart(ctx, **kwargs):
-    conn = kwargs['conn']
+    conn = kwargs["conn"]
     conn.run("service nginx restart")
     conn.run("service gunicorn-wilber restart")
 
@@ -124,7 +135,7 @@ def restart(ctx, **kwargs):
 @task
 @connect
 def status(ctx, **kwargs):
-    conn = kwargs['conn']
+    conn = kwargs["conn"]
     conn.run("service nginx status")
     conn.run("service gunicorn-wilber status")
 
@@ -155,5 +166,3 @@ def deploy(ctx):
 
     print("\nserver status:")
     status(conn)
-
-

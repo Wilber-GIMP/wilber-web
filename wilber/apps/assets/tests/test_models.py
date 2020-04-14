@@ -1,22 +1,18 @@
-from django.test import TestCase
 from django.forms.models import model_to_dict
-from django.db import IntegrityError
-from django.conf import settings
-
+from django.test import TestCase
 
 from .factories import AssetFactory
 from .factories import LikeFactory
+from apps.assets.models import Asset
+from apps.assets.models import Like
 
-from assets.models import Asset
-from assets.models import Like
 
 class TestCaseAsset(TestCase):
-
     def test_create(self):
         """
         Test the creation of a Asset model using a factory
         """
-        asset = AssetFactory.create()
+        AssetFactory.create()
         self.assertEqual(Asset.objects.count(), 1)
 
     def test_create_batch(self):
@@ -27,22 +23,21 @@ class TestCaseAsset(TestCase):
         self.assertEqual(Asset.objects.count(), 5)
         self.assertEqual(len(assets), 5)
 
-
     def test_attribute_count(self):
         """
-        Test that all attributes of Asset server are counted. It will count the primary key and all editable attributes.
+        Test that all attributes of Asset server are counted.
+        It will count the primary key and all editable attributes.
         This test should break if a new attribute is added.
         """
         asset = AssetFactory.create()
         asset_dict = model_to_dict(asset)
-        #self.assertEqual(len(asset_dict.keys()), 17)
+        # self.assertEqual(len(asset_dict.keys()), 17)
         self.assertEqual(len(asset_dict.keys()), 9)
-
-
 
     def test_attribute_content(self):
         """
-        Test that all attributes of Asset server have content. This test will break if an attributes name is changed.
+        Test that all attributes of Asset server have content.
+        This test will break if an attributes name is changed.
         """
         asset = AssetFactory.create()
         self.assertIsNotNone(asset.id)
@@ -63,7 +58,6 @@ class TestCaseAsset(TestCase):
         self.assertIsNotNone(asset.created_at)
         self.assertIsNotNone(asset.updated_at)
 
-
     def test_slug_is_unique(self):
         """
         Tests attribute slug of model Asset to see if the unique constraint works.
@@ -74,18 +68,16 @@ class TestCaseAsset(TestCase):
         asset_02 = AssetFactory.create()
         asset_02.slug = asset.slug
         asset_02.save()
-        
+
         self.assertNotEqual(asset.slug, asset_02.slug)
-        
 
 
 class TestCaseLike(TestCase):
-
     def test_create(self):
         """
         Test the creation of a Like model using a factory
         """
-        like = LikeFactory.create()
+        LikeFactory.create()
         self.assertEqual(Like.objects.count(), 1)
 
     def test_create_batch(self):
@@ -96,21 +88,20 @@ class TestCaseLike(TestCase):
         self.assertEqual(Like.objects.count(), 5)
         self.assertEqual(len(likes), 5)
 
-
     def test_attribute_count(self):
         """
-        Test that all attributes of Like server are counted. It will count the primary key and all editable attributes.
+        Test that all attributes of Like server are counted.
+        It will count the primary key and all editable attributes.
         This test should break if a new attribute is added.
         """
         like = LikeFactory.create()
         like_dict = model_to_dict(like)
         self.assertEqual(len(like_dict.keys()), 3)
 
-
-
     def test_attribute_content(self):
         """
-        Test that all attributes of Like server have content. This test will break if an attributes name is changed.
+        Test that all attributes of Like server have content.
+        This test will break if an attributes name is changed.
         """
         like = LikeFactory.create()
         self.assertIsNotNone(like.id)

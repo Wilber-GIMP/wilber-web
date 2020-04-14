@@ -1,6 +1,8 @@
 from rest_framework import serializers
-from assets.models import Like
-from assets.models import Asset
+
+from apps.assets.models import Asset
+from apps.assets.models import Like
+
 
 class AssetSerializer(serializers.ModelSerializer):
     """
@@ -9,7 +11,25 @@ class AssetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Asset
-        fields = ('id', 'created', 'modified', 'owner', 'category', 'name', 'slug', 'description', 'source', 'file', 'filesize', 'image', 'num_likes', 'num_downloads', 'num_views', 'created_at', 'updated_at')
+        fields = (
+            "id",
+            "created",
+            "modified",
+            "owner",
+            "category",
+            "name",
+            "slug",
+            "description",
+            "source",
+            "file",
+            "filesize",
+            "image",
+            "num_likes",
+            "num_downloads",
+            "num_views",
+            "created_at",
+            "updated_at",
+        )
 
 
 class LikeSerializer(serializers.ModelSerializer):
@@ -19,4 +39,4 @@ class LikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Like
-        fields = ('id', 'user', 'asset', 'timestamp')
+        fields = ("id", "user", "asset", "timestamp")

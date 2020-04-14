@@ -66,12 +66,39 @@
         </div>
 
         <div class="navbar-end">
+            {% if user.is_authenticated %}
+
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">
+                    <figure class="image is-24x24">
+                        <img style="border-radius:50%; object-fit: cover; " src="{{ user.profile.photo.url }}" alt="Placeholder image">
+                    </figure>
+                    {{ user.get_name }}
+                </a>
+
+                <div class="navbar-dropdown">
+                    <a class="navbar-item" href="{% url 'user:myself' %}">
+                        My Profile
+                    </a>
+                    <a class="navbar-item" href="{% url 'asset:myself' %}">
+                        My Assets
+                    </a>
+                    <a class="navbar-item" href="{% url 'asset:add' %}">
+                        Upload
+                    </a>
+
+                    <hr class="navbar-divider">
+                    <a class="navbar-item" href="{% url 'report' %}">
+                        Report an issue
+                    </a>
+                    <a class="button is-danger" href="{% url 'account_logout' %}">Logout</a>
+                </div>
+            </div>
+
+            {% else %}
             <div class="navbar-item">
                 <div class="buttons">
 
-                    {% if user.is_authenticated %}
-                    <a class="button is-danger" href="{% url 'account_logout' %}">Logout</a>
-                    {% else %}
                     <a class="button is-primary" href="{% url 'account_signup' %}"><strong>Sign up</strong></a>
                     <a class="button is-light" href="{% url 'account_login' %}">Log in</a>
                     {% endif %}
