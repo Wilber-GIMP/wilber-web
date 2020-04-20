@@ -1,0 +1,33 @@
+version: '3'
+
+volumes:
+  wilber_dev_postgres_data: {}
+  wilber_dev_postgres_data_backups: {}
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/dev/django/Dockerfile
+    image: wilber_local_django
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+    env_file:
+      - ./.envs/.dev/.django
+      - ./.envs/.dev/.postgres
+    ports:
+      - "8000:8000"
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/prod/postgres/Dockerfile
+    image: wilber_production_postgres
+    volumes:
+      - wilber_dev_postgres_data:/var/lib/postgresql/data
+      - wilber_dev_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.dev/.postgres

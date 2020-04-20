@@ -1,0 +1,49 @@
+version: '3'
+
+volumes:
+  wilber_production_postgres_data: {}
+  wilber_production_postgres_data_backups: {}
+  wilber_production_traefik: {}
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/prod/django/Dockerfile
+    image: wilber_production_django
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./.envs/.prod/.django
+      - ./.envs/.prod/.postgres
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/prod/postgres/Dockerfile
+    image: wilber_production_postgres
+    volumes:
+      - wilber_production_postgres_data:/var/lib/postgresql/data
+      - wilber_production_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.prod/.postgres
+
+  traefik:
+    build:
+      context: .
+      dockerfile: ./compose/prod/traefik/Dockerfile
+    image: wilber_production_traefik
+    depends_on:
+      - django
+    volumes:
+      - wilber_production_traefik:/etc/traefik/acme
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+
+  redis:
+    image: redis:5.0
+
+  
