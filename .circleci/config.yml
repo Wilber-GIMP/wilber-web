@@ -1,0 +1,33 @@
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.7-buster
+    working_directory: ~/app
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          key: deps1-{{ checksum "wilber/requirements/dev.txt" }}
+      - run:
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r wilber/requirements/dev.txt
+      - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "wilber/requirements/dev.txt" }}
+          paths:
+            - "venv"
+      - run:
+          name: Running tests
+          command: |
+            . venv/bin/activate
+            cd wilber
+            python3 manage.py test
+      - store_artifacts:
+          path: test-reports/
+          destination: python_app
