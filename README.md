@@ -21,6 +21,8 @@ Create django database and the admin user:
 ```bash
 cd wilber-web/wilber
 
+cp .env.example .env
+
 python manage.py migrate
 
 python manage.py createsuperuser --username admin --email admin@wilber.org
